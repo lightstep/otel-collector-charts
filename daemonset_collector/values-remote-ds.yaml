@@ -1,0 +1,10 @@
+collector:
+  scrape_configs_file: scrape_configs_ds.yaml
+  mode: daemonset
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 3000Mi
+    requests:
+      cpu: 1000m
+      memory: 2500Mi
