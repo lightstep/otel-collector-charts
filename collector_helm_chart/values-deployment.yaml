@@ -28,7 +28,7 @@ collectors:
       processors:
         memory_limiter:
           check_interval: 1s
-          limit_mib: 1200
+          limit_mib: 2000
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -60,7 +60,7 @@ collectors:
 
       exporters:
         otlp:
-          endpoint: ingest.staging.lightstep.com:443
+          endpoint: ingest.lightstep.com:443
           tls:
             insecure_skip_verify: true
           headers:

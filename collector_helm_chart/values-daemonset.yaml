@@ -1,6 +1,6 @@
 collectors:
-  - image: otel/opentelemetry-collector-contrib:0.52.0
-    name: deployment
+  - name: deployment
+    image: otel/opentelemetry-collector-contrib:0.52.0
     scrape_configs_file: scrape_configs.yaml
     resources:
       limits:
@@ -28,7 +28,7 @@ collectors:
       processors:
         memory_limiter:
           check_interval: 1s
-          limit_mib: 1200
+          limit_mib: 2000
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -73,8 +73,8 @@ collectors:
             processors: [memory_limiter, resourcedetection/gke, resource, batch]
             exporters: [otlp]
 
-  - image: otel/opentelemetry-collector-contrib:0.52.0
-    name: daemonset
+  - name: daemonset
+    image: otel/opentelemetry-collector-contrib:0.52.0
     mode: daemonset
     scrape_configs_file: scrape_configs_ds.yaml
     resources:
@@ -103,7 +103,7 @@ collectors:
       processors:
         memory_limiter:
           check_interval: 1s
-          limit_mib: 1200
+          limit_mib: 2000
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -135,7 +135,7 @@ collectors:
 
       exporters:
         otlp:
-          endpoint: ingest.staging.lightstep.com:443
+          endpoint: ingest.lightstep.com:443
           tls:
             insecure_skip_verify: true
           headers:
