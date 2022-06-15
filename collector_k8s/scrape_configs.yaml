@@ -1,1 +1,1 @@
-# put here your infrastructure targets that you're not able to edit with prometheus annotations.
+# add your prometheus scrape configs here.

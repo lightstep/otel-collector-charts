@@ -1,4 +1,5 @@
 collectors:
+  # The deployment collector will be used for scraping infrastructure static targets.
   - name: deployment
     image: otel/opentelemetry-collector-contrib:0.52.0
     scrape_configs_file: scrape_configs.yaml
@@ -73,6 +74,7 @@ collectors:
             processors: [memory_limiter, resourcedetection/gke, resource, batch]
             exporters: [otlp]
 
+  # The daemonset collector will be used for scraping general app metrics that contains `prometheus.io/scrape: true` annotation.
   - name: daemonset
     image: otel/opentelemetry-collector-contrib:0.52.0
     mode: daemonset
