@@ -1,9 +1,8 @@
-{{ $global := . }}
-{{ range $i, $collector := .Values.collectors -}}
+{{ range $_, $collector := .Values.collectors -}}
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: "{{ $global.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
@@ -23,7 +22,7 @@ spec:
       {{ if $collector.scrape_configs_file }}
       prometheus:
         config:
-          scrape_configs: {{ $global.Files.Get $collector.scrape_configs_file | nindent 10 }}
+          scrape_configs: {{ $.Files.Get $collector.scrape_configs_file | nindent 10 }}
       {{ end }}
     processors:
       {{- toYaml $collector.config.processors | nindent 6 }}
@@ -35,7 +34,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: "{{ $global.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 rules:
 - apiGroups: [""]
   resources:
@@ -62,15 +61,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "{{ $global.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: "{{ $global.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 subjects:
 - kind: ServiceAccount
   # quirk of the Operator
-  name: "{{ $global.Release.Name }}-{{ $collector.name }}-collector"
-  namespace: {{ $global.Release.Namespace }}
+  name: "{{ $.Release.Name }}-{{ $collector.name }}-collector"
+  namespace: {{ $.Release.Namespace }}
 ---
 {{- end }}
