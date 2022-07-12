@@ -1,6 +1,7 @@
 collectors:
-  - image: otel/opentelemetry-collector-contrib:0.52.0
-    name: deployment
+  - name: deployment
+    image: otel/opentelemetry-collector-contrib:0.52.0
+    enabled: true
     scrape_configs_file: scrape_configs.yaml
     resources:
       limits:
@@ -15,10 +16,6 @@ collectors:
           secretKeyRef:
             key: LS_TOKEN
             name: otel-collector-secret
-      - name: KUBE_NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
     config:
       receivers:
         otlp:

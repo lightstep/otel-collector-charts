@@ -1,6 +1,7 @@
 collectors:
   # The deployment collector will be used for scraping infrastructure static targets.
   - name: deployment
+    enabled: false
     image: otel/opentelemetry-collector-contrib:0.52.0
     scrape_configs_file: scrape_configs.yaml
     resources:
@@ -16,10 +17,6 @@ collectors:
           secretKeyRef:
             key: LS_TOKEN
             name: otel-collector-secret
-      - name: KUBE_NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
     config:
       receivers:
         otlp:
@@ -61,7 +58,7 @@ collectors:
 
       exporters:
         otlp:
-          endpoint: ingest.staging.lightstep.com:443
+          endpoint: ingest.lightstep.com:443
           tls:
             insecure_skip_verify: true
           headers:
@@ -77,6 +74,7 @@ collectors:
   # The daemonset collector will be used for scraping general app metrics that contains `prometheus.io/scrape: true` annotation.
   - name: daemonset
     image: otel/opentelemetry-collector-contrib:0.52.0
+    enabled: true
     mode: daemonset
     scrape_configs_file: scrape_configs_ds.yaml
     resources:
@@ -92,10 +90,6 @@ collectors:
           secretKeyRef:
             key: LS_TOKEN
             name: otel-collector-secret
-      - name: KUBE_NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
     config:
       receivers:
         otlp:

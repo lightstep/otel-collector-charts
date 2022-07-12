@@ -1,4 +1,5 @@
 {{ range $_, $collector := .Values.collectors -}}
+{{ if $collector.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
@@ -6,14 +7,19 @@ metadata:
 spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
-  podAnnotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/port: '8888'
   ports:
     - name: "metrics"
       port: 8888
   env:
     {{- toYaml $collector.env | nindent 4}}
+    - name: KUBE_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: KUBE_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
   config: |
     exporters:
       {{- toYaml $collector.config.exporters | nindent 6 }}
@@ -23,6 +29,13 @@ spec:
       prometheus:
         config:
           scrape_configs: {{ $.Files.Get $collector.scrape_configs_file | nindent 10 }}
+          - job_name: otel-collector
+            scrape_interval: 5s
+            static_configs:
+            - labels:
+                collector_name: ${KUBE_POD_NAME}
+              targets:
+                - 0.0.0.0:8888
       {{ end }}
     processors:
       {{- toYaml $collector.config.processors | nindent 6 }}
@@ -72,4 +85,5 @@ subjects:
   name: "{{ $.Release.Name }}-{{ $collector.name }}-collector"
   namespace: {{ $.Release.Namespace }}
 ---
+{{ end }}
 {{- end }}
