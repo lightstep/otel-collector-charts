@@ -1,39 +1,53 @@
+{{ range $_, $collector := .Values.collectors -}}
+{{ if $collector.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: {{ .Release.Name }}-collector
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 spec:
-  image: {{ .Values.collector.image }}
+  mode: {{ $collector.mode }}
+  image: {{ $collector.image }}
   ports:
-    - port: 8888
+    - name: "metrics"
+      port: 8888
   env:
-    {{- toYaml .Values.collector.env | nindent 4}}
+    {{- toYaml $collector.env | nindent 4}}
+    - name: KUBE_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: KUBE_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
   config: |
     exporters:
-      {{- toYaml .Values.collector.config.exporters | nindent 6 }}
+      {{- toYaml $collector.config.exporters | nindent 6 }}
     receivers:
-      # Note that this configuration is specific to using the OTel collector
-      # with the prometheus receiver.
+      {{- toYaml $collector.config.receivers | nindent 6 }}
+      {{ if $collector.scrape_configs_file }}
       prometheus:
         config:
-          scrape_configs: {{ .Files.Get "scrape_configs.yaml" | nindent 10 }}
+          scrape_configs: {{ $.Files.Get $collector.scrape_configs_file | nindent 10 }}
           - job_name: otel-collector
             scrape_interval: 5s
             static_configs:
-            - targets:
-              - 0.0.0.0:8888
-
+            - labels:
+                collector_name: ${KUBE_POD_NAME}
+              targets:
+                - 0.0.0.0:8888
+      {{ end }}
     processors:
-      {{- toYaml .Values.collector.config.processors | nindent 6 }}
+      {{- toYaml $collector.config.processors | nindent 6 }}
     service:
-      {{- toYaml .Values.collector.config.service | nindent 6 }}
+      {{- toYaml $collector.config.service | nindent 6 }}
   resources:
-    {{- toYaml .Values.collector.resources | nindent 4 }}
+    {{- toYaml $collector.resources | nindent 4 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Release.Name }}-collector
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 rules:
 - apiGroups: [""]
   resources:
@@ -60,13 +74,16 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ .Release.Name }}-collector
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ .Release.Name }}-collector
+  name: "{{ $.Release.Name }}-{{ $collector.name }}"
 subjects:
 - kind: ServiceAccount
   # quirk of the Operator
-  name: {{ .Release.Name }}-collector-collector
-  namespace: {{ .Release.Namespace }}
+  name: "{{ $.Release.Name }}-{{ $collector.name }}-collector"
+  namespace: {{ $.Release.Namespace }}
+---
+{{ end }}
+{{- end }}

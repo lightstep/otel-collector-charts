@@ -1,0 +1,145 @@
+collectors:
+  # The deployment collector should be configured to scrape infrastructure or static targets.
+  - name: deployment
+    enabled: false
+    image: otel/opentelemetry-collector-contrib:0.52.0
+    scrape_configs_file: scrape_configs.yaml
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 3000Mi
+      requests:
+        cpu: 1000m
+        memory: 2500Mi
+    env:
+      - name: LS_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: LS_TOKEN
+            name: otel-collector-secret
+    config:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 2000
+        resourcedetection/gke:
+          detectors: [env, gke]
+          timeout: 2s
+          override: false
+        batch:
+          send_batch_size: 1000
+          timeout: 1s
+          send_batch_max_size: 1500
+        resource:
+          attributes:
+          - key: job
+            from_attribute: service.name
+            action: insert
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.daemonset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.replicaset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.statefulset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.job.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.cronjob.name
+
+      exporters:
+        otlp:
+          endpoint: ingest.lightstep.com:443
+          tls:
+            insecure_skip_verify: true
+          headers:
+            "lightstep-access-token": "${LS_TOKEN}"
+
+      service:
+        pipelines:
+          metrics:
+            receivers: [prometheus]
+            processors: [memory_limiter, resourcedetection/gke, resource, batch]
+            exporters: [otlp]
+
+  # The daemonset collector should be configured to scrape general app metrics that contains `prometheus.io/scrape: true` annotation.
+  - name: daemonset
+    image: otel/opentelemetry-collector-contrib:0.52.0
+    enabled: true
+    mode: daemonset
+    scrape_configs_file: scrape_configs_ds.yaml
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 3000Mi
+      requests:
+        cpu: 1000m
+        memory: 2500Mi
+    env:
+      - name: LS_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: LS_TOKEN
+            name: otel-collector-secret
+    config:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_mib: 2000
+        resourcedetection/gke:
+          detectors: [env, gke]
+          timeout: 2s
+          override: false
+        batch:
+          send_batch_size: 1000
+          timeout: 1s
+          send_batch_max_size: 1500
+        resource:
+          attributes:
+          - key: job
+            from_attribute: service.name
+            action: insert
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.daemonset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.replicaset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.statefulset.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.job.name
+          - key: service.name
+            action: upsert
+            from_attribute: k8s.cronjob.name
+
+      exporters:
+        otlp:
+          endpoint: ingest.lightstep.com:443
+          tls:
+            insecure_skip_verify: true
+          headers:
+            "lightstep-access-token": "${LS_TOKEN}"
+
+      service:
+        pipelines:
+          metrics:
+            receivers: [prometheus]
+            processors: [memory_limiter, resourcedetection/gke, resource, batch]
+            exporters: [otlp]
