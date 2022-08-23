@@ -10,6 +10,14 @@ spec:
   ports:
     - name: "metrics"
       port: 8888
+{{- if eq $collector.mode "statefulset" }}
+  targetAllocator:
+    enabled: true
+    image: $collector.targetallocator.image
+    serviceAccount: {{ .Release.Name }}-collector-targetallocator
+    prometheusCR:
+      enabled: $collector.targetallocator.prometheusCR.enabled
+{{- end }}
   env:
     {{- toYaml $collector.env | nindent 4}}
     - name: KUBE_NODE_NAME
@@ -58,6 +66,11 @@ rules:
   - endpoints
   - pods
   verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
 - apiGroups:
   - extensions
   resources:
@@ -84,6 +97,11 @@ subjects:
   # quirk of the Operator
   name: "{{ $.Release.Name }}-{{ $collector.name }}-collector"
   namespace: {{ $.Release.Namespace }}
+{{- if eq $collector.mode "statefulset" }}
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-collector-targetallocator
+  namespace: {{ .Release.Namespace }}
+{{- end }}
 ---
 {{ end }}
 {{- end }}
