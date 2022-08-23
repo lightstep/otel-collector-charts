@@ -7,14 +7,16 @@ metadata:
 spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
+  replicas: {{ $collector.replicas | default 1 }}
   ports:
     - name: "metrics"
+      protocol: TCP
       port: 8888
 {{- if eq $collector.mode "statefulset" }}
   targetAllocator:
     enabled: true
     image: $collector.targetallocator.image
-    serviceAccount: {{ .Release.Name }}-collector-targetallocator
+    serviceAccount: {{ $.Release.Name }}-collector-targetallocator
     prometheusCR:
       enabled: $collector.targetallocator.prometheusCR.enabled
 {{- end }}
@@ -37,6 +39,7 @@ spec:
       prometheus:
         config:
           scrape_configs: {{ $.Files.Get $collector.scrape_configs_file | nindent 10 }}
+          {{- if (not (eq $collector.mode "statefulset")) }}
           - job_name: otel-collector
             scrape_interval: 5s
             static_configs:
@@ -44,6 +47,7 @@ spec:
                 collector_name: ${KUBE_POD_NAME}
               targets:
                 - 0.0.0.0:8888
+          {{ end }}
       {{ end }}
     processors:
       {{- toYaml $collector.config.processors | nindent 6 }}
@@ -99,8 +103,8 @@ subjects:
   namespace: {{ $.Release.Namespace }}
 {{- if eq $collector.mode "statefulset" }}
 - kind: ServiceAccount
-  name: {{ .Release.Name }}-collector-targetallocator
-  namespace: {{ .Release.Namespace }}
+  name: {{ $.Release.Name }}-collector-targetallocator
+  namespace: {{ $.Release.Namespace }}
 {{- end }}
 ---
 {{ end }}

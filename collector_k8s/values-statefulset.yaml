@@ -3,12 +3,13 @@ collectors:
     image: otel/opentelemetry-collector-contrib:0.58.0
     enabled: true
     mode: statefulset
+    replicas: 2
     targetallocator:
       enabled: true
       image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.1.0
       prometheusCR:
         enabled: false
-    scrape_configs_file: scrape_configs.yaml
+    scrape_configs_file: scrape_configs_statefulset.yaml
     resources:
       limits:
         cpu: 2000m
