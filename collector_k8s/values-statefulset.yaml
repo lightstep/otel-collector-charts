@@ -61,6 +61,21 @@ collectors:
           - key: service.name
             action: upsert
             from_attribute: k8s.cronjob.name
+          - key: instance
+            from_attribute: service.instance.id
+            action: insert
+          - key: k8s_cluster_name
+            from_attribute: k8s.cluster.name
+            action: insert
+          - key: collector.name
+            value: "${KUBE_POD_NAME}"
+            action: insert
+          - key: cloud_platform
+            from_attribute: cloud.platform
+            action: insert
+          - key: cloud_provider
+            from_attribute: cloud.provider
+            action: insert
 
       exporters:
         otlp:

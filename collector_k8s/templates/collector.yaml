@@ -1,9 +1,10 @@
 {{ range $_, $collector := .Values.collectors -}}
 {{ if $collector.enabled }}
+{{ $collectorName := (print $.Release.Name "-" $collector.name) }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: "{{ $.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $collectorName }}"
 spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
@@ -15,10 +16,10 @@ spec:
 {{- if eq $collector.mode "statefulset" }}
   targetAllocator:
     enabled: true
-    image: $collector.targetallocator.image
+    image: {{ $collector.targetallocator.image }}
     serviceAccount: {{ $.Release.Name }}-collector-targetallocator
     prometheusCR:
-      enabled: $collector.targetallocator.prometheusCR.enabled
+      enabled: {{ $collector.targetallocator.prometheusCR.enabled }}
 {{- end }}
   env:
     {{- toYaml $collector.env | nindent 4}}
@@ -38,7 +39,7 @@ spec:
       {{ if $collector.scrape_configs_file }}
       prometheus:
         config:
-          scrape_configs: {{ $.Files.Get $collector.scrape_configs_file | nindent 10 }}
+          scrape_configs: {{ tpl ($.Files.Get $collector.scrape_configs_file) (dict "collectorName" $collectorName "Template" $.Template) | nindent 10 }}
           {{- if (not (eq $collector.mode "statefulset")) }}
           - job_name: otel-collector
             scrape_interval: 5s
@@ -59,7 +60,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: "{{ $.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $collectorName }}"
 rules:
 - apiGroups: [""]
   resources:
@@ -91,15 +92,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "{{ $.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $collectorName }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: "{{ $.Release.Name }}-{{ $collector.name }}"
+  name: "{{ $collectorName }}"
 subjects:
 - kind: ServiceAccount
   # quirk of the Operator
-  name: "{{ $.Release.Name }}-{{ $collector.name }}-collector"
+  name: "{{ $collectorName }}-collector"
   namespace: {{ $.Release.Namespace }}
 {{- if eq $collector.mode "statefulset" }}
 - kind: ServiceAccount
