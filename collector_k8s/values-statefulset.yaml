@@ -3,7 +3,7 @@ collectors:
     image: otel/opentelemetry-collector-contrib:0.58.0
     enabled: true
     mode: statefulset
-    replicas: 2
+    replicas: 3
     targetallocator:
       enabled: true
       image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.1.0
