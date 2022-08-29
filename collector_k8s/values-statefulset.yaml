@@ -1,8 +1,15 @@
 collectors:
-  - name: deployment
+  - name: statefulset
     image: otel/opentelemetry-collector-contrib:0.58.0
     enabled: true
-    scrape_configs_file: scrape_configs.yaml
+    mode: statefulset
+    replicas: 3
+    targetallocator:
+      enabled: true
+      image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.1.0
+      prometheusCR:
+        enabled: false
+    scrape_configs_file: scrape_configs_statefulset.yaml
     resources:
       limits:
         cpu: 2000m
@@ -25,7 +32,7 @@ collectors:
       processors:
         memory_limiter:
           check_interval: 1s
-          limit_mib: 2000
+          limit_percentage: 75
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -54,6 +61,9 @@ collectors:
           - key: service.name
             action: upsert
             from_attribute: k8s.cronjob.name
+          - key: collector.name
+            value: "${KUBE_POD_NAME}"
+            action: insert
 
       exporters:
         otlp:
