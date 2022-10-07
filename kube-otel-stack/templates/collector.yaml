@@ -1,0 +1,123 @@
+{{ range $_, $collector := .Values.collectors -}}
+{{ if $collector.enabled }}
+{{ $collectorName := (print $.Release.Name "-" $collector.name) }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "{{ $collectorName }}"
+spec:
+  mode: {{ $collector.mode }}
+  image: {{ $collector.image }}
+  replicas: {{ $collector.replicas | default 1 }}
+  ports:
+    - name: "metrics"
+      protocol: TCP
+      port: 8888
+{{- if $collector.targetallocator.enabled }}
+  targetAllocator:
+    enabled: true
+    image: {{ $collector.targetallocator.image }}
+    serviceAccount: {{ $collectorName }}-targetallocator
+    replicas: {{ $collector.targetallocator.replicas }}
+    allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
+    prometheusCR:
+      enabled: {{ $collector.targetallocator.prometheusCR.enabled }}
+{{- end }}
+  env:
+    {{- toYaml $collector.env | nindent 4}}
+    - name: KUBE_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: KUBE_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+  config: |
+    exporters:
+      {{- toYaml $collector.config.exporters | nindent 6 }}
+    receivers:
+      {{- toYaml $collector.config.receivers | nindent 6 }}
+      prometheus:
+        config:
+          scrape_configs:
+          {{ if $collector.scrape_configs_file }}
+          {{ tpl ($.Files.Get $collector.scrape_configs_file) (dict "collectorName" $collectorName "Template" $.Template) | nindent 10 }}
+          {{- if (not (eq $collector.mode "statefulset")) }}
+          - job_name: otel-collector
+            scrape_interval: 5s
+            static_configs:
+            - labels:
+                collector_name: ${KUBE_POD_NAME}
+              targets:
+                - 0.0.0.0:8888
+          {{ end }}
+          {{ end }}
+        {{- if $collector.targetallocator.enabled }}
+        target_allocator:
+          endpoint: http://{{ $collectorName }}-targetallocator:80
+          interval: 30s
+          collector_id: ${POD_NAME}
+          http_sd_config:
+            refresh_interval: 60s
+        {{ end }}
+    processors:
+      {{- toYaml $collector.config.processors | nindent 6 }}
+    service:
+      {{- toYaml $collector.config.service | nindent 6 }}
+  resources:
+    {{- toYaml $collector.resources | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ $collectorName }}"
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ $collectorName }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ $collectorName }}"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "{{ $collectorName }}-collector"
+  namespace: {{ $.Release.Namespace }}
+{{- if eq $collector.mode "statefulset" }}
+- kind: ServiceAccount
+  name: {{ $collectorName }}-targetallocator
+  namespace: {{ $.Release.Namespace }}
+{{- end }}
+---
+{{ end }}
+{{- end }}

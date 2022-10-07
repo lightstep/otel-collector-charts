@@ -1,0 +1,49 @@
+{{ range $_, $collector := .Values.collectors -}}
+{{ if $collector.enabled }}
+{{ $collectorName := (print $.Release.Name "-" $collector.name) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $collectorName }}-collector
+spec:
+  endpoints:
+  - path: /metrics
+    port: monitoring
+  namespaceSelector:
+    matchNames:
+    - opentelemetry
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $collectorName }}-collector-monitoring
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $collectorName }}-targetallocator
+spec:
+  endpoints:
+  - path: /metrics
+    port: targetallocation
+  namespaceSelector:
+    matchNames:
+    - opentelemetry
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $collectorName }}-targetallocator
+{{ end }}
+{{ end }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-operator
+spec:
+  endpoints:
+  - path: /metrics
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - opentelemetry
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opentelemetry-operator

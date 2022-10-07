@@ -1,0 +1,22 @@
+{{- if and .Values.kubeScheduler.enabled .Values.kubeScheduler.endpoints }}
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ template "kube-otel-stack.fullname" . }}-kube-scheduler
+  labels:
+    app: {{ template "kube-otel-stack.name" . }}-kube-scheduler
+    k8s-app: kube-scheduler
+{{ include "kube-otel-stack.labels" . | indent 4 }}
+  namespace: kube-system
+subsets:
+  - addresses:
+      {{- range .Values.kubeScheduler.endpoints }}
+      - ip: {{ . }}
+      {{- end }}
+    ports:
+      - name: http-metrics
+        {{- $kubeSchedulerDefaultInsecurePort := 10251 }}
+        {{- $kubeSchedulerDefaultSecurePort := 10259 }}
+        port: {{ include "kube-otel-stack.kubeScheduler.insecureScrape" (list . $kubeSchedulerDefaultInsecurePort $kubeSchedulerDefaultSecurePort .Values.kubeScheduler.service.port)  }}
+        protocol: TCP
+{{- end }}
