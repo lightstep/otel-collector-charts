@@ -6,7 +6,7 @@ nameOverride: ""
 ##
 collectors:
   - name: statefulset
-    image: jaronoff/opentelemetry-collector-contrib:v62
+    image: otel/opentelemetry-collector-contrib:0.62.0
     enabled: true
     mode: statefulset
     replicas: 3
