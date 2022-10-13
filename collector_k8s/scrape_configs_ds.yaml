@@ -1,3 +1,10 @@
+- job_name: otel-collector
+  scrape_interval: 5s
+  static_configs:
+  - labels:
+      collector_name: ${KUBE_POD_NAME}
+    targets:
+      - 0.0.0.0:8888
 - job_name: apps
   kubernetes_sd_configs:
   - role: pod
