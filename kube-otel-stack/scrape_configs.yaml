@@ -1,0 +1,11 @@
+# This is just needed for now unfortunately, just drop it all though
+- job_name: dummy
+  static_configs:
+    - targets:
+        - 127.0.0.1:8888
+  metric_relabel_configs:
+    - source_labels: [__name__]
+      separator: ;
+      regex: "^$"
+      replacement: $1
+      action: keep

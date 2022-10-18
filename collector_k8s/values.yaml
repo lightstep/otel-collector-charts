@@ -1,0 +1,51 @@
+collectors:
+  - name: deployment
+    image: otel/opentelemetry-collector-contrib:0.61.0
+    replicas: 1
+    enabled: true
+    scrape_configs_file: scrape_configs.yaml
+    resources:
+      limits:
+        cpu: 500m
+        memory: 500Mi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+    env:
+      - name: LS_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: LS_TOKEN
+            name: otel-collector-secret
+    config:
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+      processors:
+        memory_limiter:
+          check_interval: 1s
+          limit_percentage: 75
+          spike_limit_percentage: 30
+        batch:
+          send_batch_size: 1000
+          timeout: 1s
+          send_batch_max_size: 1500
+
+      exporters:
+        otlp:
+          endpoint: ingest.lightstep.com:443
+          headers:
+            "lightstep-access-token": "${LS_TOKEN}"
+
+      service:
+        pipelines:
+          metrics:
+            receivers: [prometheus]
+            processors: [memory_limiter, batch]
+            exporters: [otlp]
+          traces:
+            receivers: [otlp]
+            processors: [memory_limiter, batch]
+            exporters: [otlp]
