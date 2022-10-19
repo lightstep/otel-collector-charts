@@ -42,7 +42,7 @@ spec:
         config:
           scrape_configs:
           {{ if $collector.scrape_configs_file }}
-          {{ tpl ($.Files.Get $collector.scrape_configs_file) (dict "collectorName" $collectorName "Template" $.Template) | nindent 10 }}
+          {{ tpl ($.Files.Get $collector.scrape_configs_file) $ | nindent 10 }}
           {{- if (not (eq $collector.mode "statefulset")) }}
           - job_name: otel-collector
             scrape_interval: 5s
