@@ -1,6 +1,0 @@
-apiVersion: v2
-name: otelcollector
-description: A Helm chart for managing otel-collector
-type: application
-version: 0.0.1
-appVersion: latest

@@ -2,9 +2,14 @@ apiVersion: v2
 name: kube-otel-stack
 description: A Helm chart for managing the otel-collector and default kubernetes components
 type: application
-version: 0.0.1
+version: 0.1.0
 appVersion: 0.61.0
 dependencies:
+# cert manager must be manually installed because it has CRDs
+# https://github.com/kubernetes-sigs/security-profiles-operator/issues/1062
+# - name: opentelemetry-operator
+#   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+#   version: 0.15.0
 - name: kube-state-metrics
   version: "4.20.2"
   repository: "https://prometheus-community.github.io/helm-charts"
