@@ -1,11 +1,10 @@
-# Lightstep's OpenTelemetry Collector Prometheus Replacement
-This is the repository for Lightstep's recommendations for running an opentelemetry collector that scrapes Prometheus targets. You can find the documentation for how to use this [here](https://docs.lightstep.com/docs/ingest-prometheus)
+# Lightstep OpenTelemetry Collector Helm Charts
 
-# Deployment modes
-OpenTelemetry Collector is a flexible system that can be deployed in several ways, here we list our recommended and tested modes.
+This is the repository for Lightstep's recommended [Helm](https://helm.sh/) charts for running an OpenTelemetry Collector using the [OpenTelemetry Operator for Kubernetes](https://github.com/open-telemetry/opentelemetry-operator). You can find documentation and tutorials for how to use these charts [here](https://docs.lightstep.com/docs/ingest-prometheus).
 
-## Deployment with single replica
-For deploying the OpenTelemetry Collector as a deployment with a single replica, follow the example helm values inside `collector_k8s/values-deployment.yaml`.
+⚠️ Lightstep's OpenTelemetry Helm charts are under active development and may have breaking changes between releases.
 
-## Daemonset + Deployment
-For deploying the OpenTelemetry Collector with a mixed deployed composed of one Daemonset OpenTelemetry Collector - for collecting general application metrics - and a Deployment with single replica - for collecting insfrastructure targets , follow the example helm values inside `collector_k8s/values-daemonset.yaml`.
+## Charts
+
+* [collector-k8s](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/collector-k8s) - Chart for using the OpenTelemetry Collector to scape static or dynamic metric targets.
+* [kube-otel-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/kube-otel-stack) - Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry Operator.
