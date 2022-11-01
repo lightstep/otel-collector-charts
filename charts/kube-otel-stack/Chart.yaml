@@ -1,8 +1,8 @@
 apiVersion: v2
 name: kube-otel-stack
-description: A Helm chart for managing the otel-collector and default kubernetes components
+description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry Operator.
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: 0.61.0
 dependencies:
 # cert manager must be manually installed because it has CRDs
