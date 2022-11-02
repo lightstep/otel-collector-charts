@@ -1,0 +1,19 @@
+collector:
+  enabled: true
+  name: http-check
+  image: otel/opentelemetry-collector-contrib:0.63.0
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
+    requests:
+      cpu: 500m
+      memory: 500Mi
+
+checks:
+ lightstep/api:
+    url: https://api.lightstep.com
+    method: GET
+    collection_interval: 60s 
+ cloudflare:
+    url: https://1.1.1.1
