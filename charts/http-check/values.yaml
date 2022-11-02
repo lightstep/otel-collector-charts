@@ -11,9 +11,9 @@ collector:
       memory: 500Mi
 
 checks:
- lightstep/api:
+  lightstep/api:
     url: https://api.lightstep.com
     method: GET
     collection_interval: 60s 
- cloudflare:
+  cloudflare:
     url: https://1.1.1.1
