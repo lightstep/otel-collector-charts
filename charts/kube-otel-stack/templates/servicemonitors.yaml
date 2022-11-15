@@ -1,4 +1,5 @@
-{{ range $_, $collector := .Values.collectors -}}
+{{ $collectorList := (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) }}
+{{ range $_, $collector := $collectorList -}}
 {{ if $collector.enabled }}
 {{ $collectorName := (print $.Release.Name "-" $collector.name) }}
 apiVersion: monitoring.coreos.com/v1

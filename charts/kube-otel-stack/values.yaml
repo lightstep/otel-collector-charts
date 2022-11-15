@@ -2,91 +2,179 @@ fullnameOverride: ""
 namespaceOverride: ""
 nameOverride: ""
 
-## Collectors to be installed to the cluster
-##
-collectors:
-  - name: statefulset
-    image: otel/opentelemetry-collector-contrib:0.62.0
+## Auto-Instrumentation resource to be installed in the cluster
+## Can be used by setting the following:
+##  Java: instrumentation.opentelemetry.io/inject-java: "true"
+##  NodeJS: instrumentation.opentelemetry.io/inject-nodejs: "true"
+##  Python: instrumentation.opentelemetry.io/inject-python: "true"
+##  DotNet: instrumentation.opentelemetry.io/inject-dotnet: "true"
+##  OpenTelemetry SDK environment variables only: instrumentation.opentelemetry.io/inject-sdk: "true"
+autoinstrumentation:
+  enabled: false
+  ## The collector name to send traces to
+  collectorTarget: traces
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+
+  ## Sampler defines the OTEL sampler behavior to be used. Example:
+  ##
+  ## sampler:
+  ##   type: parentbased_traceidratio
+  ##   argument: "0.25"
+  ##
+  sampler:
+    ## The value can be for instance parentbased_always_on, parentbased_always_off, parentbased_traceidratio...
+    type: parentbased_traceidratio
+    ## The value depends on the sampler type.
+    ## For instance for parentbased_traceidratio sampler type it is a number in range [0..1] e.g. 0.25.
+    argument: "0.25"
+
+  ## A list of corev1.EnvVars
+  env: []
+
+  ## https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/overview.md#resources
+  resource: {}
+
+## Custom collectors to be installed to the cluster
+## Matches the structure of tracesCollector and metricsCollector
+collectors: []
+
+## Default collector for tracing
+tracesCollector:
+  enabled: false
+  name: traces
+  image: otel/opentelemetry-collector-contrib:0.64.0
+  mode: deployment
+  replicas: 1
+  resources:
+    limits:
+      cpu: 750m
+      memory: 1000Mi
+    requests:
+      cpu: 750m
+      memory: 1000Mi
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 30
+      batch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+      resource:
+        attributes:
+        - key: collector.name
+          value: "${KUBE_POD_NAME}"
+          action: insert
+
+    exporters:
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          "lightstep-access-token": "${LS_TOKEN}"
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, resource, batch]
+          exporters: [otlp]
+
+## Default collector for metrics (includes infrastructure metrics)
+metricsCollector:
+  name: metrics
+  image: otel/opentelemetry-collector-contrib:0.64.0
+  enabled: true
+  mode: statefulset
+  replicas: 3
+  targetallocator:
     enabled: true
-    mode: statefulset
-    replicas: 3
-    targetallocator:
+    allocationStrategy: "consistent-hashing"
+    replicas: 2
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.60.0
+    prometheusCR:
       enabled: true
-      allocationStrategy: "consistent-hashing"
-      replicas: 2
-      image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.60.0
-      prometheusCR:
-        enabled: true
-    # No need for a scrape config when using prometheusCRs
-    scrape_configs_file: "scrape_configs.yaml"
-    resources:
-      limits:
-        cpu: 750m
-        memory: 1000Mi
-      requests:
-        cpu: 750m
-        memory: 1000Mi
-    env:
-      - name: LS_TOKEN
-        valueFrom:
-          secretKeyRef:
-            key: LS_TOKEN
-            name: otel-collector-secret
-    config:
-      receivers:
-        otlp:
-          protocols:
-            grpc:
-              endpoint: "0.0.0.0:4317"
-      processors:
-        memory_limiter:
-          check_interval: 1s
-          limit_percentage: 75
-          spike_limit_percentage: 30
-        resourcedetection/gke:
-          detectors: [env, gke]
-          timeout: 2s
-          override: false
-        batch:
-          send_batch_size: 1000
-          timeout: 1s
-          send_batch_max_size: 1500
-        resource:
-          attributes:
-          - key: job
-            from_attribute: service.name
-            action: insert
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.daemonset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.replicaset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.statefulset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.job.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.cronjob.name
-          - key: collector.name
-            value: "${KUBE_POD_NAME}"
-            action: insert
+  # No need for a scrape config when using prometheusCRs
+  scrape_configs_file: "scrape_configs.yaml"
+  resources:
+    limits:
+      cpu: 750m
+      memory: 1000Mi
+    requests:
+      cpu: 750m
+      memory: 1000Mi
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 30
+      batch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+      resource:
+        attributes:
+        - key: job
+          from_attribute: service.name
+          action: insert
+        - key: service.name
+          action: upsert
+          from_attribute: k8s.daemonset.name
+        - key: service.name
+          action: upsert
+          from_attribute: k8s.replicaset.name
+        - key: service.name
+          action: upsert
+          from_attribute: k8s.statefulset.name
+        - key: service.name
+          action: upsert
+          from_attribute: k8s.job.name
+        - key: service.name
+          action: upsert
+          from_attribute: k8s.cronjob.name
+        - key: collector.name
+          value: "${KUBE_POD_NAME}"
+          action: insert
 
-      exporters:
-        otlp:
-          endpoint: ingest.lightstep.com:443
-          headers:
-            "lightstep-access-token": "${LS_TOKEN}"
+    exporters:
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          "lightstep-access-token": "${LS_TOKEN}"
 
-      service:
-        pipelines:
-          metrics:
-            receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, resource, batch]
-            exporters: [otlp]
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          processors: [memory_limiter, resource, batch]
+          exporters: [otlp]
 
 ## Component scraping the kube api server
 ##

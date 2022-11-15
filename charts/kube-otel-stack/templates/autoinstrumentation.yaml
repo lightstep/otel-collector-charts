@@ -1,0 +1,23 @@
+{{ if .Values.autoinstrumentation.enabled }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: {{ $.Release.Name }}-instrumentation
+spec:
+  exporter:
+    endpoint: http://{{ $.Release.Name }}-{{ .Values.autoinstrumentation.collectorTarget }}-collector.{{ $.Release.Namespace }}:4317
+  propagators:
+{{ toYaml .Values.autoinstrumentation.propagators | indent 4 }}
+  {{ with .Values.autoinstrumentation.sampler }}
+  sampler:
+{{ toYaml . | indent 4 }}
+  {{ end }}
+  {{ with .Values.autoinstrumentation.env }}
+  env:
+{{ toYaml . | indent 4 }}
+  {{ end }}
+  {{ with .Values.autoinstrumentation.resource }}
+  resource:
+{{ toYaml . | indent 4 }}
+  {{ end }}
+{{- end }}
