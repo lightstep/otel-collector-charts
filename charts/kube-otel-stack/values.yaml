@@ -10,7 +10,8 @@ nameOverride: ""
 ##  DotNet: instrumentation.opentelemetry.io/inject-dotnet: "true"
 ##  OpenTelemetry SDK environment variables only: instrumentation.opentelemetry.io/inject-sdk: "true"
 autoinstrumentation:
-  enabled: true
+  enabled: false
+  ## The collector name to send traces to
   collectorTarget: traces
   propagators:
     - tracecontext
@@ -37,12 +38,12 @@ autoinstrumentation:
   resource: {}
 
 ## Custom collectors to be installed to the cluster
-##
+## Matches the structure of tracesCollector and metricsCollector
 collectors: []
 
 ## Default collector for tracing
 tracesCollector:
-  enabled: true
+  enabled: false
   name: traces
   image: otel/opentelemetry-collector-contrib:0.64.0
   mode: deployment
