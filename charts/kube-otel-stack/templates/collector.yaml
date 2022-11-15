@@ -1,4 +1,5 @@
-{{ range $_, $collector := .Values.collectors -}}
+{{ $collectorList := (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) }}
+{{ range $_, $collector := $collectorList -}}
 {{ if $collector.enabled }}
 {{ $collectorName := (print $.Release.Name "-" $collector.name) }}
 apiVersion: opentelemetry.io/v1alpha1
@@ -13,6 +14,7 @@ spec:
     - name: "metrics"
       protocol: TCP
       port: 8888
+{{- if $collector.targetallocator }}
 {{- if $collector.targetallocator.enabled }}
   targetAllocator:
     enabled: true
@@ -22,6 +24,7 @@ spec:
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
     prometheusCR:
       enabled: {{ $collector.targetallocator.prometheusCR.enabled }}
+{{- end }}
 {{- end }}
   env:
     {{- toYaml $collector.env | nindent 4}}
@@ -43,6 +46,7 @@ spec:
           scrape_configs:
           {{ if $collector.scrape_configs_file }}
           {{ tpl ($.Files.Get $collector.scrape_configs_file) $ | nindent 10 }}
+          {{ end }}
           {{- if (not (eq $collector.mode "statefulset")) }}
           - job_name: otel-collector
             scrape_interval: 5s
@@ -52,7 +56,7 @@ spec:
               targets:
                 - 0.0.0.0:8888
           {{ end }}
-          {{ end }}
+        {{- if $collector.targetallocator }}
         {{- if $collector.targetallocator.enabled }}
         target_allocator:
           endpoint: http://{{ $collectorName }}-targetallocator:80
@@ -60,6 +64,7 @@ spec:
           collector_id: ${POD_NAME}
           http_sd_config:
             refresh_interval: 60s
+        {{ end }}
         {{ end }}
     processors:
       {{- toYaml $collector.config.processors | nindent 6 }}
