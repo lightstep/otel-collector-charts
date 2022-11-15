@@ -90,10 +90,6 @@ tracesCollector:
 
     service:
       pipelines:
-        metrics:
-          receivers: [prometheus]
-          processors: [memory_limiter, resource, batch]
-          exporters: [otlp]
         traces:
           receivers: [otlp]
           processors: [memory_limiter, resource, batch]
