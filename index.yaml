@@ -2,6 +2,26 @@ apiVersion: v1
 entries:
   kube-otel-stack:
   - apiVersion: v2
+    appVersion: 0.64.0
+    created: "2022-11-15T23:20:46.551948035Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: 3ae77a2a24f79ea04537e8bb46fdef069af6e5d525f6f412a7ef8c720669f95d
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.2.0/kube-otel-stack-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.61.0
     created: "2022-10-31T21:26:58.960770988Z"
     dependencies:
@@ -33,4 +53,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2022-10-31T21:26:59.129754873Z"
+generated: "2022-11-15T23:20:46.551962036Z"
