@@ -76,6 +76,11 @@ tracesCollector:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
+      resource:
+        attributes:
+        - key: collector.name
+          value: "${KUBE_POD_NAME}"
+          action: insert
 
     exporters:
       otlp:
@@ -87,11 +92,11 @@ tracesCollector:
       pipelines:
         metrics:
           receivers: [prometheus]
-          processors: [memory_limiter, batch]
+          processors: [memory_limiter, resource, batch]
           exporters: [otlp]
         traces:
           receivers: [otlp]
-          processors: [memory_limiter, batch]
+          processors: [memory_limiter, resource, batch]
           exporters: [otlp]
 
 ## Default collector for metrics (includes infrastructure metrics)

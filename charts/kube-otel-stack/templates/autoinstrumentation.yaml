@@ -5,8 +5,7 @@ metadata:
   name: {{ $.Release.Name }}-instrumentation
 spec:
   exporter:
-    # kube-otel-stack-statefulset-collector
-    endpoint: http://{{ $.Release.Name }}-{{ .Values.autoinstrumentation.collectorTarget }}.{{ $.Release.Namespace }}:4317
+    endpoint: http://{{ $.Release.Name }}-{{ .Values.autoinstrumentation.collectorTarget }}-collector.{{ $.Release.Namespace }}:4317
   propagators:
 {{ toYaml .Values.autoinstrumentation.propagators | indent 4 }}
   {{ with .Values.autoinstrumentation.sampler }}
