@@ -19,7 +19,6 @@ spec:
   targetAllocator:
     enabled: true
     image: {{ $collector.targetallocator.image }}
-    serviceAccount: {{ $collectorName }}-targetallocator
     replicas: {{ $collector.targetallocator.replicas }}
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
     prometheusCR:
@@ -39,6 +38,8 @@ spec:
   config: |
     exporters:
       {{- toYaml $collector.config.exporters | nindent 6 }}
+    extensions:
+      {{- toYaml $collector.config.extensions | nindent 6 }}
     receivers:
       {{- toYaml $collector.config.receivers | nindent 6 }}
       prometheus:
