@@ -45,16 +45,16 @@ collectors: []
 tracesCollector:
   enabled: false
   name: traces
-  image: otel/opentelemetry-collector-contrib:0.64.0
+  image: otel/opentelemetry-collector-contrib:0.71.0
   mode: deployment
   replicas: 1
   resources:
     limits:
-      cpu: 750m
-      memory: 1000Mi
+      cpu: 250m
+      memory: 250Mi
     requests:
-      cpu: 750m
-      memory: 1000Mi
+      cpu: 250m
+      memory: 250Mi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -98,7 +98,7 @@ tracesCollector:
 ## Default collector for metrics (includes infrastructure metrics)
 metricsCollector:
   name: metrics
-  image: otel/opentelemetry-collector-contrib:0.64.0
+  image: otel/opentelemetry-collector-contrib:0.71.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -106,18 +106,18 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.60.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.70.0
     prometheusCR:
       enabled: true
   # No need for a scrape config when using prometheusCRs
   scrape_configs_file: "scrape_configs.yaml"
   resources:
     limits:
-      cpu: 750m
-      memory: 1000Mi
+      cpu: 250m
+      memory: 250Mi
     requests:
-      cpu: 750m
-      memory: 1000Mi
+      cpu: 250m
+      memory: 250Mi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -125,6 +125,14 @@ metricsCollector:
           key: LS_TOKEN
           name: otel-collector-secret
   config:
+    extensions:
+      health_check:
+        endpoint: "0.0.0.0:13133"
+        path: "/"
+        check_collector_pipeline:
+          enabled: true
+          interval: "5m"
+          exporter_failure_threshold: 5
     receivers:
       otlp:
         protocols:
@@ -170,6 +178,8 @@ metricsCollector:
           "lightstep-access-token": "${LS_TOKEN}"
 
     service:
+      extensions:
+        - health_check
       pipelines:
         metrics:
           receivers: [prometheus]
