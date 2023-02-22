@@ -21,8 +21,15 @@ spec:
     image: {{ $collector.targetallocator.image }}
     replicas: {{ $collector.targetallocator.replicas }}
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
+    {{- if $collector.targetallocator.filterStrategy }}
+    filterStrategy: {{ $collector.targetallocator.filterStrategy }}
+    {{- end }}
+    {{- if $collector.targetallocator.prometheusCR.enabled }}
     prometheusCR:
-      enabled: {{ $collector.targetallocator.prometheusCR.enabled }}
+      {{- with $collector.targetallocator.prometheusCR }}
+      {{- toYaml .  | nindent 6 }}
+      {{- end }}
+    {{- end }}
 {{- end }}
 {{- end }}
   env:

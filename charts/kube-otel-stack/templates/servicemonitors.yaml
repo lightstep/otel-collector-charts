@@ -6,6 +6,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ $collectorName }}-collector
+  labels:
+{{ include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   endpoints:
   - path: /metrics
@@ -21,6 +23,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ $collectorName }}-targetallocator
+  labels:
+{{ include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   endpoints:
   - path: /metrics
@@ -38,6 +42,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ .Release.Name }}-operator
+  labels:
+{{ include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   endpoints:
   - path: /metrics
