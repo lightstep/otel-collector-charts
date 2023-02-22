@@ -776,6 +776,11 @@ kubeProxy:
 ##
 kubeStateMetrics:
   enabled: true
+  ## This option is to create a service monitor for an existing installation
+  serviceMonitor:
+    enabled: false
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
 
 ## Configuration for kube-state-metrics subchart
 ##
@@ -831,6 +836,11 @@ kube-state-metrics:
 ##
 nodeExporter:
   enabled: true
+  serviceMonitor:
+    ## This option is to create a service monitor for an existing installation
+    enabled: false
+    matchLabels:
+      app.kubernetes.io/name: prometheus-node-exporter
 
 ## Configuration for prometheus-node-exporter subchart
 ##

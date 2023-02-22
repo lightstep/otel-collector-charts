@@ -6,10 +6,20 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: "{{ $collectorName }}"
+  {{- with $collector.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+  labels:
+    {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
   replicas: {{ $collector.replicas | default 1 }}
+  {{- with $collector.podAnnotations }}
+  podAnnotations:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
   ports:
     - name: "metrics"
       protocol: TCP

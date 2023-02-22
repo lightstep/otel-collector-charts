@@ -54,3 +54,37 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: opentelemetry-operator
+{{- if .Values.kubeStateMetrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-kube-state-metrics
+  labels:
+{{ include "kube-otel-stack.labels" $ | indent 4 }}
+spec:
+  endpoints:
+  - honorLabels: true
+    port: http
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels:
+      {{- toYaml .Values.kubeStateMetrics.serviceMonitor.matchLabels | nindent 6 }}
+{{- end }}
+{{- if .Values.nodeExporter.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-node-exporter
+  labels:
+{{ include "kube-otel-stack.labels" $ | indent 4 }}
+spec:
+  endpoints:
+  - port: http-metrics
+    scheme: http
+  jobLabel: jobLabel
+  selector:
+    matchLabels:
+      {{- toYaml .Values.nodeExporter.serviceMonitor.matchLabels | nindent 6 }}
+{{- end }}
