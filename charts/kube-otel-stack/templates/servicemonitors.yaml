@@ -14,7 +14,7 @@ spec:
     port: monitoring
   namespaceSelector:
     matchNames:
-    - {{ .Release.Namespace }}
+    - {{ $.Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ $collectorName }}-collector-monitoring
@@ -31,7 +31,7 @@ spec:
     port: targetallocation
   namespaceSelector:
     matchNames:
-    - {{ .Release.Namespace }}
+    - {{ $.Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ $collectorName }}-targetallocator
@@ -50,7 +50,7 @@ spec:
     port: metrics
   namespaceSelector:
     matchNames:
-    - {{ default .operatorNamespaceOverride | .Release.Namespace }}
+    - {{ default .operatorNamespaceOverride .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: opentelemetry-operator
@@ -83,7 +83,7 @@ metadata:
 {{ include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   endpoints:
-  - port: {{ default .Values.nodeExporter.serviceMonitor.portName | "http-metrics" }}
+  - port: {{ default .Values.nodeExporter.serviceMonitor.portName "http-metrics" }}
     scheme: http
   jobLabel: jobLabel
   selector:
