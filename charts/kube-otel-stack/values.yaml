@@ -1,6 +1,7 @@
 fullnameOverride: ""
 namespaceOverride: ""
 nameOverride: ""
+operatorNamespaceOverride: ""
 
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
