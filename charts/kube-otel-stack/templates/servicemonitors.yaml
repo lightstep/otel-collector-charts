@@ -50,7 +50,7 @@ spec:
     port: metrics
   namespaceSelector:
     matchNames:
-    - {{ default .operatorNamespaceOverride .Release.Namespace }}
+    - {{ .operatorNamespaceOverride | default .Release.Namespace }}
   selector:
     matchLabels:
       app.kubernetes.io/name: opentelemetry-operator
@@ -83,7 +83,7 @@ metadata:
 {{ include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   endpoints:
-  - port: {{ default .Values.nodeExporter.serviceMonitor.portName "http-metrics" }}
+  - port: {{ .Values.nodeExporter.serviceMonitor.portName | default "http-metrics" }}
     scheme: http
   jobLabel: jobLabel
   namespaceSelector:
