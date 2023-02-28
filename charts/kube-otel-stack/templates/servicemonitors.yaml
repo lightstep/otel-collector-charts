@@ -86,6 +86,8 @@ spec:
   - port: {{ default .Values.nodeExporter.serviceMonitor.portName "http-metrics" }}
     scheme: http
   jobLabel: jobLabel
+  namespaceSelector:
+    any: true
   selector:
     matchLabels:
       {{- toYaml .Values.nodeExporter.serviceMonitor.matchLabels | nindent 6 }}

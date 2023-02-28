@@ -131,7 +131,7 @@ metricsCollector:
         endpoint: "0.0.0.0:13133"
         path: "/"
         check_collector_pipeline:
-          enabled: true
+          enabled: false
           interval: "5m"
           exporter_failure_threshold: 5
     receivers:
