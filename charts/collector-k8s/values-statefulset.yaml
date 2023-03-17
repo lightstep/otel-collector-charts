@@ -43,24 +43,6 @@ collectors:
           send_batch_max_size: 1500
         resource:
           attributes:
-          - key: job
-            from_attribute: service.name
-            action: insert
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.daemonset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.replicaset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.statefulset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.job.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.cronjob.name
           - key: collector.name
             value: "${KUBE_POD_NAME}"
             action: insert
