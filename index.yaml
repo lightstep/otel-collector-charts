@@ -3,6 +3,26 @@ entries:
   kube-otel-stack:
   - apiVersion: v2
     appVersion: 0.70.0
+    created: "2023-03-17T18:25:09.176140653Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: b97c99b15fa169bda2308c65cdc28ad6bd7f7f797332240dcfbbc81b6dbb033f
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.2.7/kube-otel-stack-0.2.7.tgz
+    version: 0.2.7
+  - apiVersion: v2
+    appVersion: 0.70.0
     created: "2023-02-28T17:17:43.073660147Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
@@ -144,6 +164,17 @@ entries:
   otelcollector:
   - apiVersion: v2
     appVersion: 0.61.0
+    created: "2023-03-17T18:25:09.351211219Z"
+    description: Chart for using the OpenTelemetry Collector to scape static or dynamic
+      metric targets.
+    digest: e25ea6a35c90818fa2af839fcf86d8099c549db9d9c30adaf4138fa705b82b0b
+    name: otelcollector
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otelcollector-0.1.2/otelcollector-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 0.61.0
     created: "2022-10-31T21:26:59.129739473Z"
     description: Chart for using the OpenTelemetry Collector to scape static or dynamic
       metric targets.
@@ -153,4 +184,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2023-02-28T17:17:43.073688447Z"
+generated: "2023-03-17T18:25:09.351258519Z"
