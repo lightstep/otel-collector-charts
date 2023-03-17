@@ -35,26 +35,6 @@ collectors:
           send_batch_size: 1000
           timeout: 1s
           send_batch_max_size: 1500
-        resource:
-          attributes:
-          - key: job
-            from_attribute: service.name
-            action: insert
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.daemonset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.replicaset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.statefulset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.job.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.cronjob.name
 
       exporters:
         otlp:
@@ -66,7 +46,7 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, resource, batch]
+            processors: [memory_limiter, resourcedetection/gke, batch]
             exporters: [otlp]
 
   # The daemonset collector should be configured to scrape general app metrics that contains `prometheus.io/scrape: true` annotation.
@@ -106,26 +86,6 @@ collectors:
           send_batch_size: 1000
           timeout: 1s
           send_batch_max_size: 1500
-        resource:
-          attributes:
-          - key: job
-            from_attribute: service.name
-            action: insert
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.daemonset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.replicaset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.statefulset.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.job.name
-          - key: service.name
-            action: upsert
-            from_attribute: k8s.cronjob.name
 
       exporters:
         otlp:
@@ -137,5 +97,5 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, resource, batch]
+            processors: [memory_limiter, resourcedetection/gke, batch]
             exporters: [otlp]
