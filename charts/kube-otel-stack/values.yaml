@@ -63,8 +63,6 @@ tracesCollector:
         secretKeyRef:
           key: LS_TOKEN
           name: otel-collector-secret
-    - name: OTEL_RESOURCE_ATTRIBUTES
-      value: ""
   config:
     receivers:
       otlp:
