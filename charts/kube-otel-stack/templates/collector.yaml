@@ -44,6 +44,8 @@ spec:
 {{- end }}
   env:
     {{- toYaml $collector.env | nindent 4}}
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name={{ $collector.clusterName | default "unknown" }}"
     - name: KUBE_NODE_NAME
       valueFrom:
         fieldRef:
