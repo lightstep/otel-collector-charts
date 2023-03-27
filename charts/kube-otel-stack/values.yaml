@@ -46,6 +46,7 @@ collectors: []
 tracesCollector:
   enabled: false
   name: traces
+  clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.71.0
   mode: deployment
   replicas: 1
@@ -73,6 +74,10 @@ tracesCollector:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 30
+      resourcedetection/env:
+        detectors: [env]
+        timeout: 2s
+        override: false
       batch:
         send_batch_size: 1000
         timeout: 1s
@@ -93,12 +98,13 @@ tracesCollector:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [memory_limiter, resource, batch]
+          processors: [memory_limiter, resource, resourcedetection/env, batch]
           exporters: [otlp]
 
 ## Default collector for metrics (includes infrastructure metrics)
 metricsCollector:
   name: metrics
+  clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.71.0
   enabled: true
   mode: statefulset
@@ -144,6 +150,10 @@ metricsCollector:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 30
+      resourcedetection/env:
+        detectors: [env]
+        timeout: 2s
+        override: false
       batch:
         send_batch_size: 1000
         timeout: 1s
@@ -166,7 +176,7 @@ metricsCollector:
       pipelines:
         metrics:
           receivers: [prometheus]
-          processors: [memory_limiter, resource, batch]
+          processors: [memory_limiter, resource, resourcedetection/env, batch]
           exporters: [otlp]
 
 ## Component scraping the kube api server
