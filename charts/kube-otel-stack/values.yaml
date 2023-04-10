@@ -84,6 +84,10 @@ tracesCollector:
         send_batch_max_size: 1500
       k8sattributes:
         passthrough: false
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
         extract:
           metadata:
             - k8s.cluster.name
@@ -91,6 +95,9 @@ tracesCollector:
             - k8s.pod.name
             - k8s.pod.uid
             - k8s.node.name
+            - k8s.pod.start_time
+            - container.image.tag
+            - container.image.name
       resource:
         attributes:
         - key: lightstep.helm_chart
@@ -168,6 +175,10 @@ metricsCollector:
         override: false
       k8sattributes:
         passthrough: false
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
         extract:
           metadata:
             - k8s.cluster.name
@@ -175,6 +186,9 @@ metricsCollector:
             - k8s.pod.name
             - k8s.pod.uid
             - k8s.node.name
+            - k8s.pod.start_time
+            - container.image.tag
+            - container.image.name
       batch:
         send_batch_size: 1000
         timeout: 1s
