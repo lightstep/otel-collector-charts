@@ -190,7 +190,6 @@ metricsCollector:
               - from: resource_attribute
                 name: k8s.pod.name
         extract:
-        extract:
           metadata:
             - k8s.cluster.name
             - k8s.namespace.name
