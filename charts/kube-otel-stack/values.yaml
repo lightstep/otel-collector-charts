@@ -165,9 +165,6 @@ metricsCollector:
           action: insert
         - key: job
           from_attribute: service.name
-          action: insert  
-        - key: k8s.pod.ip
-          from_attribute: "net.host.name"
           action: insert
 
     exporters:
