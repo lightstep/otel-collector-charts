@@ -47,7 +47,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.71.0
+  image: otel/opentelemetry-collector-contrib:0.73.0
   mode: deployment
   replicas: 1
   resources:
@@ -105,7 +105,7 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.71.0
+  image: otel/opentelemetry-collector-contrib:0.73.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -113,7 +113,7 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.70.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.73.0
     prometheusCR:
       enabled: true
   # No need for a scrape config when using prometheusCRs
@@ -121,10 +121,10 @@ metricsCollector:
   resources:
     limits:
       cpu: 250m
-      memory: 250Mi
+      memory: 500Mi
     requests:
       cpu: 250m
-      memory: 250Mi
+      memory: 500Mi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -162,6 +162,12 @@ metricsCollector:
         attributes:
         - key: collector.name
           value: "${KUBE_POD_NAME}"
+          action: insert
+        - key: job
+          from_attribute: service.name
+          action: insert  
+        - key: k8s.pod.ip
+          from_attribute: "net.host.name"
           action: insert
 
     exporters:
@@ -383,6 +389,7 @@ kubelet:
     relabelings:
       - sourceLabels: [__metrics_path__]
         targetLabel: metrics_path
+      - sourceLabels: []
     # - sourceLabels: [__meta_kubernetes_pod_node_name]
     #   separator: ;
     #   regex: ^(.*)$
