@@ -236,7 +236,7 @@ metricsCollector:
         - health_check
       pipelines:
         metrics:
-          receivers: [prometheus]
+          receivers: [prometheus, otlp]
           processors: [memory_limiter, resource, resourcedetection/env, k8sattributes, batch]
           exporters: [otlp]
 
