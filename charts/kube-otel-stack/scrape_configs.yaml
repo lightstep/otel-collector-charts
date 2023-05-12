@@ -112,6 +112,14 @@
     source_labels:
     - id
     - pod
+  - action: replace
+    regex: "kube_service_info;(.*)"
+    replacement: "${1}"
+    separator: ";"
+    source_labels:
+    - __name__
+    - service
+    target_label: k8s_service_name
   metrics_path: "/metrics/cadvisor"
   relabel_configs:
   - action: replace
