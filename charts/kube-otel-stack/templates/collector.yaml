@@ -1,4 +1,4 @@
-{{ $collectorList := (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) }}
+{{ $collectorList := (append (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) .Values.logsCollector)}}
 {{ range $_, $collector := $collectorList -}}
 {{ if $collector.enabled }}
 {{ $collectorName := (print $.Release.Name "-" $collector.name) }}
