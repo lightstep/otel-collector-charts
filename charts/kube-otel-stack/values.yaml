@@ -90,7 +90,6 @@ tracesCollector:
                 name: k8s.pod.name
         extract:
           metadata:
-            - k8s.cluster.name
             - k8s.namespace.name
             - k8s.pod.name
             - k8s.pod.uid
@@ -200,7 +199,6 @@ metricsCollector:
                 name: k8s.pod.name
         extract:
           metadata:
-            - k8s.cluster.name
             - k8s.namespace.name
             - k8s.pod.name
             - k8s.pod.uid
