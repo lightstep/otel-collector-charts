@@ -179,6 +179,15 @@ metricsCollector:
         check_interval: 1s
         limit_percentage: 75
         spike_limit_percentage: 30
+      metricstransform/k8sservicename:
+        transforms:
+          - include: kube_service_info
+            match_type: strict
+            action: update
+            operations:
+              - action: update_label
+                label: service
+                new_label: k8s.service.name
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
@@ -237,7 +246,7 @@ metricsCollector:
       pipelines:
         metrics:
           receivers: [prometheus, otlp]
-          processors: [memory_limiter, resource, resourcedetection/env, k8sattributes, batch]
+          processors: [memory_limiter, resource, resourcedetection/env, k8sattributes, metricstransform/k8sservicename, batch]
           exporters: [otlp]
 
 ## Component scraping the kube api server
