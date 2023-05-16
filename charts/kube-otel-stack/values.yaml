@@ -388,7 +388,6 @@ logsCollector:
                 name: k8s.pod.name
         extract:
           metadata:
-            - k8s.cluster.name
             - k8s.namespace.name
             - k8s.pod.name
             - k8s.pod.uid
@@ -420,7 +419,7 @@ logsCollector:
         endpoints: ["https://logingest.lightstep.com"]
         index: "lightstep"
         headers:
-          "lightstep-access-token": "${LS_ACCESS_TOKEN}"
+          "lightstep-access-token": "${LS_TOKEN}"
 
     service:
       pipelines:
