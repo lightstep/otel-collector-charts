@@ -127,13 +127,11 @@ tracesCollector:
         traces:
           receivers: [otlp]
           processors:
-            [
-              memory_limiter,
-              resource,
-              resourcedetection/env,
-              k8sattributes,
-              batch,
-            ]
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - batch
           exporters: [otlp]
 
 ## Default collector for metrics (includes infrastructure metrics)
@@ -252,14 +250,12 @@ metricsCollector:
         metrics:
           receivers: [prometheus, otlp]
           processors:
-            [
-              memory_limiter,
-              resource,
-              resourcedetection/env,
-              k8sattributes,
-              metricstransform/k8sservicename,
-              batch,
-            ]
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - metricstransform/k8sservicename
+            - batch
           exporters: [otlp]
 
 logsCollector:
@@ -426,13 +422,11 @@ logsCollector:
         logs:
           receivers: [filelog]
           processors:
-            [
-              memory_limiter,
-              resource,
-              resourcedetection/env,
-              k8sattributes,
-              batch,
-            ]
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - batch
           exporters: [elasticsearch]
 
 ## Component scraping the kube api server
