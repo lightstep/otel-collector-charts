@@ -265,7 +265,7 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.76.3
+  image: otel/opentelemetry-collector-contrib:latest
   enabled: false
   mode: daemonset
   resources:
