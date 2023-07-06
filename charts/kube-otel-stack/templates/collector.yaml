@@ -1,4 +1,4 @@
-{{ $collectorList := (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) }}
+{{ $collectorList := (append (append (append .Values.collectors .Values.tracesCollector) .Values.metricsCollector) .Values.logsCollector)}}
 {{ range $_, $collector := $collectorList -}}
 {{ if $collector.enabled }}
 {{ $collectorName := (print $.Release.Name "-" $collector.name) }}
@@ -108,6 +108,14 @@ spec:
       {{- toYaml $collector.config.service | nindent 6 }}
   resources:
     {{- toYaml $collector.resources | nindent 4 }}
+{{- if $collector.volumes }}
+  volumes:
+    {{- toYaml $collector.volumes | nindent 4 }}
+{{ end }}
+{{- if $collector.volumeMounts }}
+  volumeMounts:
+    {{- toYaml $collector.volumeMounts | nindent 4 }}
+{{ end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

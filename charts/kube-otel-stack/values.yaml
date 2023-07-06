@@ -109,12 +109,12 @@ tracesCollector:
             - container.image.name
       resource:
         attributes:
-        - key: lightstep.helm_chart
-          value: kube-otel-stack
-          action: insert
-        - key: collector.name
-          value: "${KUBE_POD_NAME}"
-          action: insert
+          - key: lightstep.helm_chart
+            value: kube-otel-stack
+            action: insert
+          - key: collector.name
+            value: "${KUBE_POD_NAME}"
+            action: insert
 
     exporters:
       otlp:
@@ -126,7 +126,12 @@ tracesCollector:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [memory_limiter, resource, resourcedetection/env, k8sattributes, batch]
+          processors:
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - batch
           exporters: [otlp]
 
 ## Default collector for metrics (includes infrastructure metrics)
@@ -222,15 +227,15 @@ metricsCollector:
         send_batch_max_size: 1500
       resource:
         attributes:
-        - key: lightstep.helm_chart
-          value: kube-otel-stack
-          action: insert
-        - key: collector.name
-          value: "${KUBE_POD_NAME}"
-          action: insert
-        - key: job
-          from_attribute: service.name
-          action: insert
+          - key: lightstep.helm_chart
+            value: kube-otel-stack
+            action: insert
+          - key: collector.name
+            value: "${KUBE_POD_NAME}"
+            action: insert
+          - key: job
+            from_attribute: service.name
+            action: insert
 
     exporters:
       otlp:
@@ -244,7 +249,211 @@ metricsCollector:
       pipelines:
         metrics:
           receivers: [prometheus, otlp]
-          processors: [memory_limiter, resource, resourcedetection/env, k8sattributes, metricstransform/k8sservicename, batch]
+          processors:
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - metricstransform/k8sservicename
+            - batch
+          exporters: [otlp]
+
+logsCollector:
+  name: logs
+  clusterName: ""
+  image: otel/opentelemetry-collector-contrib:0.80.0
+  enabled: false
+  mode: daemonset
+  resources:
+    limits:
+      cpu: 250m
+      memory: 250Mi
+    requests:
+      cpu: 250m
+      memory: 250Mi
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+  volumeMounts:
+    - mountPath: /var/log
+      name: varlog
+      readOnly: true
+    - mountPath: /var/lib/docker/containers
+      name: varlibdockercontainers
+      readOnly: true
+  terminationGracePeriodSeconds: 30
+  volumes:
+    - name: varlog
+      hostPath:
+        path: /var/log
+    - name: varlibdockercontainers
+      hostPath:
+        path: /var/lib/docker/containers
+  config:
+    receivers:
+      # inspired by https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/081678933ad0246a0fcb9564c8f1871480a306aa/examples/kubernetes/otel-collector-config.yml
+      filelog:
+        include:
+          - /var/log/pods/*/*/*.log
+        start_at: beginning
+        include_file_path: true
+        include_file_name: false
+        operators:
+          # Find out which format is used by kubernetes
+          - type: router
+            id: get-format
+            routes:
+              - output: parser-docker
+                expr: 'body matches "^\\{"'
+              - output: parser-crio
+                expr: 'body matches "^[^ Z]+ "'
+              - output: parser-containerd
+                expr: 'body matches "^[^ Z]+Z"'
+          # Parse CRI-O format
+          - type: regex_parser
+            id: parser-crio
+            regex: "^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$"
+            output: extract_metadata_from_filepath
+            timestamp:
+              parse_from: attributes.time
+              layout_type: gotime
+              layout: "2006-01-02T15:04:05.999999999Z07:00"
+          # Parse CRI-Containerd format
+          - type: regex_parser
+            id: parser-containerd
+            regex: "^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$"
+            output: extract_metadata_from_filepath
+            timestamp:
+              parse_from: attributes.time
+              layout: "%Y-%m-%dT%H:%M:%S.%LZ"
+          # Parse Docker format
+          - type: json_parser
+            id: parser-docker
+            output: extract_metadata_from_filepath
+            timestamp:
+              parse_from: attributes.time
+              layout: "%Y-%m-%dT%H:%M:%S.%LZ"
+          - type: move
+            from: attributes.log
+            to: body
+          # Extract metadata from file path
+          - type: regex_parser
+            id: extract_metadata_from_filepath
+            regex: '^.*\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\-]{36})\/(?P<container_name>[^\._]+)\/(?P<restart_count>\d+)\.log$'
+            parse_from: attributes["log.file.path"]
+            cache:
+              # default maximum amount of Pods per Node is 110
+              size: 128
+          # Rename attributes
+          - type: move
+            from: attributes.stream
+            to: attributes["log.iostream"]
+          - type: move
+            from: attributes.container_name
+            to: resource["k8s.container.name"]
+          - type: move
+            from: attributes.namespace
+            to: resource["k8s.namespace.name"]
+          - type: move
+            from: attributes.pod_name
+            to: resource["k8s.pod.name"]
+          - type: move
+            from: attributes.restart_count
+            to: resource["k8s.container.restart_count"]
+          - type: move
+            from: attributes.uid
+            to: resource["k8s.pod.uid"]
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 30
+      resourcedetection/env:
+        detectors: [env]
+        timeout: 2s
+        override: false
+      batch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+      metricstransform/k8sservicename:
+        transforms:
+          - include: kube_service_info
+            match_type: strict
+            action: update
+            operations:
+              - action: update_label
+                label: service
+                new_label: k8s.service.name
+      k8sattributes:
+        passthrough: false
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+        extract:
+          metadata:
+            - k8s.namespace.name
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.node.name
+            - k8s.pod.start_time
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.replicaset.uid
+            - k8s.daemonset.name
+            - k8s.daemonset.uid
+            - k8s.job.name
+            - k8s.job.uid
+            - k8s.cronjob.name
+            - k8s.statefulset.name
+            - k8s.statefulset.uid
+            - container.image.tag
+            - container.image.name
+      resource:
+        attributes:
+          - key: lightstep.helm_chart
+            value: kube-otel-stack
+            action: insert
+          - key: collector.name
+            value: "${KUBE_POD_NAME}"
+            action: insert
+
+    exporters:
+      elasticsearch:
+        endpoints: ["https://logingest.lightstep.com"]
+        index: "lightstep"
+        headers:
+          "lightstep-access-token": "${LS_TOKEN}"
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          "lightstep-access-token": "${LS_TOKEN}"
+
+    service:
+      pipelines:
+        logs:
+          receivers: [filelog]
+          processors:
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - batch
+          exporters: [elasticsearch]
+        # include self-scraped metrics, see `templates/collector.yaml` for `prometheus` receiver definition
+        metrics:
+          receivers: [prometheus]
+          processors:
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - metricstransform/k8sservicename
+            - batch
           exporters: [otlp]
 
 ## Component scraping the kube api server
@@ -342,27 +551,27 @@ kubelet:
       # Drop less useful container CPU metrics.
       - sourceLabels: [__name__]
         action: drop
-        regex: 'container_cpu_(cfs_throttled_seconds_total|load_average_10s|system_seconds_total|user_seconds_total)'
+        regex: "container_cpu_(cfs_throttled_seconds_total|load_average_10s|system_seconds_total|user_seconds_total)"
       # Drop less useful container / always zero filesystem metrics.
       - sourceLabels: [__name__]
         action: drop
-        regex: 'container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)'
+        regex: "container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)"
       # Drop less useful / always zero container memory metrics.
       - sourceLabels: [__name__]
         action: drop
-        regex: 'container_memory_(mapped_file|swap)'
+        regex: "container_memory_(mapped_file|swap)"
       # Drop less useful container process metrics.
       - sourceLabels: [__name__]
         action: drop
-        regex: 'container_(file_descriptors|tasks_state|threads_max)'
+        regex: "container_(file_descriptors|tasks_state|threads_max)"
       # Drop container spec metrics that overlap with kube-state-metrics.
       - sourceLabels: [__name__]
         action: drop
-        regex: 'container_spec.*'
+        regex: "container_spec.*"
       # Drop cgroup metrics with no pod.
       - sourceLabels: [id, pod]
         action: drop
-        regex: '.+;'
+        regex: ".+;"
     # - sourceLabels: [__name__, image]
     #   separator: ;
     #   regex: container_([a-z_]+);
