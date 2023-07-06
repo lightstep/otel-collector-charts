@@ -262,7 +262,7 @@ logsCollector:
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.80.0
-  enabled: false
+  enabled: true
   mode: daemonset
   resources:
     limits:
@@ -379,6 +379,15 @@ logsCollector:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
+      metricstransform/k8sservicename:
+        transforms:
+          - include: kube_service_info
+            match_type: strict
+            action: update
+            operations:
+              - action: update_label
+                label: service
+                new_label: k8s.service.name
       k8sattributes:
         passthrough: false
         pod_association:
@@ -419,6 +428,10 @@ logsCollector:
         index: "lightstep"
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          "lightstep-access-token": "${LS_TOKEN}"
 
     service:
       pipelines:
@@ -431,6 +444,17 @@ logsCollector:
             - k8sattributes
             - batch
           exporters: [elasticsearch]
+        # include self-scraped metrics, see `templates/collector.yaml` for `prometheus` receiver definition
+        metrics:
+          receivers: [prometheus]
+          processors:
+            - memory_limiter
+            - resource
+            - resourcedetection/env
+            - k8sattributes
+            - metricstransform/k8sservicename
+            - batch
+          exporters: [otlp]
 
 ## Component scraping the kube api server
 ##
