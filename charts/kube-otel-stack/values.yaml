@@ -294,7 +294,7 @@ logsCollector:
         path: /var/lib/docker/containers
   config:
     receivers:
-       k8s_events:
+      k8s_events: {}
       # inspired by https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/081678933ad0246a0fcb9564c8f1871480a306aa/examples/kubernetes/otel-collector-config.yml
       filelog:
         include:
@@ -437,7 +437,7 @@ logsCollector:
     service:
       pipelines:
         logs:
-          receivers: [k8s_events,filelog]
+          receivers: [k8s_events, filelog]
           processors:
             - memory_limiter
             - resource
