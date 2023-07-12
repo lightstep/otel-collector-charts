@@ -130,6 +130,7 @@ rules:
   - services
   - endpoints
   - pods
+  - events
   verbs: ["get", "list", "watch"]
 - apiGroups: ["monitoring.coreos.com"]
   resources:
