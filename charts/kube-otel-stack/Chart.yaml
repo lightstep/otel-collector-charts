@@ -2,8 +2,8 @@ apiVersion: v2
 name: kube-otel-stack
 description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry Operator.
 type: application
-version: 0.2.13
-appVersion: 0.73.0
+version: 0.2.14
+appVersion: 0.80.0
 dependencies:
 # cert manager must be manually installed because it has CRDs
 # https://github.com/kubernetes-sigs/security-profiles-operator/issues/1062
