@@ -143,6 +143,14 @@ rules:
   - ingresses
   verbs: ["get", "list", "watch"]
 - apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
   - networking.k8s.io
   resources:
   - ingresses
