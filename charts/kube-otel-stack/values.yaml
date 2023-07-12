@@ -47,7 +47,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.73.0
+  image: otel/opentelemetry-collector-contrib:0.80.0
   mode: deployment
   replicas: 1
   resources:
@@ -138,7 +138,7 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.73.0
+  image: otel/opentelemetry-collector-contrib:0.80.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -146,7 +146,7 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.73.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.80.0
     prometheusCR:
       enabled: true
   # No need for a scrape config when using prometheusCRs
