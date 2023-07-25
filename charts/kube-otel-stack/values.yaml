@@ -89,6 +89,11 @@ tracesCollector:
               - from: resource_attribute
                 name: k8s.pod.name
         extract:
+          labels:
+            - tag_name: kube_app_$$1
+              key_regex: ^app\.kubernetes\.io/([a-zA-Z0-9_-]+)
+            - tag_name: app
+              key: app
           metadata:
             - k8s.namespace.name
             - k8s.pod.name
@@ -203,6 +208,11 @@ metricsCollector:
               - from: resource_attribute
                 name: k8s.pod.name
         extract:
+          labels:
+            - tag_name: kube_app_$$1
+              key_regex: ^app\.kubernetes\.io/([a-zA-Z0-9_-]+)
+            - tag_name: app
+              key: app
           metadata:
             - k8s.namespace.name
             - k8s.pod.name
@@ -396,6 +406,11 @@ logsCollector:
               - from: resource_attribute
                 name: k8s.pod.name
         extract:
+          labels:
+            - tag_name: kube_app_$$1
+              key_regex: ^app\.kubernetes\.io/([a-zA-Z0-9_-]+)
+            - tag_name: app
+              key: app
           metadata:
             - k8s.namespace.name
             - k8s.pod.name
