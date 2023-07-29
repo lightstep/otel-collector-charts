@@ -39,6 +39,38 @@ collectors:
             - pod
             - container
       processors:
+        k8sattributes:
+          filter:
+            node_from_env_var: K8S_NODE_NAME
+          pod_association:
+            - sources:
+                - from: resource_attribute
+                  name: k8s.pod.name
+          extract:
+            labels:
+            - tag_name: service.name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: k8s.app.instance
+              key: app.kubernetes.io/instance
+              from: pod
+            - tag_name: service.version
+              key: app.kubernetes.io/version
+              from: pod
+            - tag_name: k8s.app.component
+              key: app.kubernetes.io/component
+              from: pod
+            metadata:
+              - k8s.deployment.name
+              - k8s.replicaset.name
+              - k8s.replicaset.uid
+              - k8s.daemonset.name
+              - k8s.daemonset.uid
+              - k8s.job.name
+              - k8s.job.uid
+              - k8s.cronjob.name
+              - k8s.statefulset.name
+              - k8s.statefulset.uid
         memory_limiter:
           check_interval: 1s
           limit_mib: 2000
@@ -49,7 +81,7 @@ collectors:
 
       exporters:
         logging:
-          verbosity: normal
+          verbosity: detailed
           sampling_initial: 5
           sampling_thereafter: 200
         otlp:
@@ -62,10 +94,10 @@ collectors:
           metrics/collector:
             receivers: [prometheus]
             processors: [memory_limiter, batch]
-            exporters: [logging, otlp]
+            exporters: [otlp]
           metrics/kubelet:
             receivers: [kubeletstats]
-            processors: [memory_limiter, batch]
+            processors: [memory_limiter, k8sattributes, batch]
             exporters: [logging, otlp]
 
   # collect cluster-level metrics
