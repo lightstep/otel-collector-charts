@@ -23,6 +23,8 @@ spec:
       valueFrom:
         fieldRef:
           fieldPath: metadata.name
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name={{ $collector.clusterName | default "unknown" }}"
   config: |
     exporters:
       {{- toYaml $collector.config.exporters | nindent 6 }}

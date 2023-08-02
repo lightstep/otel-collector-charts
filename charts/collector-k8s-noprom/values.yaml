@@ -39,6 +39,10 @@ collectors:
             - pod
             - container
       processors:
+        resourcedetection/env:
+          detectors: [env]
+          timeout: 2s
+          override: false
         k8sattributes:
           filter:
             node_from_env_var: K8S_NODE_NAME
@@ -81,7 +85,7 @@ collectors:
 
       exporters:
         logging:
-          verbosity: detailed
+          verbosity: normal
           sampling_initial: 5
           sampling_thereafter: 200
         otlp:
@@ -97,12 +101,12 @@ collectors:
             exporters: [otlp]
           metrics/kubelet:
             receivers: [kubeletstats]
-            processors: [memory_limiter, k8sattributes, batch]
+            processors: [memory_limiter, resourcedetection/env, k8sattributes, batch]
             exporters: [logging, otlp]
 
   # collect cluster-level metrics
   - name: cluster-stats
-    image: otel/opentelemetry-collector-contrib:0.81.0
+    image: otel/opentelemetry-collector-contrib:0.80.0
     replicas: 1
     enabled: true
     resources:
@@ -133,13 +137,18 @@ collectors:
                 targets:
                   - 0.0.0.0:8888
         k8s_cluster:
+          auth_type: serviceAccount
           collection_interval: 10s
-          node_conditions_to_report: [Ready,MemoryPressure,DiskPressure,NetworkUnavailable]
-          allocatable_types_to_report: [cpu,memory,storage]
+          node_conditions_to_report: [Ready, MemoryPressure, DiskPressure, NetworkUnavailable]
+          allocatable_types_to_report: [cpu, memory, storage]
         k8s_events:
-          auth_type : serviceAccount
-      
+          auth_type: serviceAccount
+
       processors:
+        resourcedetection/env:
+          detectors: [env]
+          timeout: 2s
+          override: false
         memory_limiter:
           check_interval: 1s
           limit_percentage: 75
@@ -148,7 +157,7 @@ collectors:
           send_batch_size: 1000
           timeout: 1s
           send_batch_max_size: 1500
-      
+
       exporters:
         logging:
           verbosity: normal
@@ -158,19 +167,14 @@ collectors:
           endpoint: ingest.lightstep.com:443
           headers:
             "lightstep-access-token": "${LS_TOKEN}"
-            
+
       service:
         pipelines:
-          # TODO: seperate collector preferred (?)
-          #logs:
-          #  receivers: [k8s_cluster]
-          #  processors: [memory_limiter, batch]
-          #  exporters: [otlp]
           metrics/collector:
             receivers: [prometheus]
             processors: [memory_limiter, batch]
             exporters: [otlp]
           metrics/k8s_cluster:
             receivers: [k8s_cluster]
-            processors: [memory_limiter, batch]
+            processors: [memory_limiter, resourcedetection/env, batch]
             exporters: [otlp, logging]
