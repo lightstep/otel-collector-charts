@@ -3,6 +3,16 @@ entries:
   collector-k8s-noprom:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-08-15T17:43:58.082971091Z"
+    description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
+    digest: 73d3b783ad16ac639900d53ae17b8fc393ccdd0a9766d9372823bbf1b572910a
+    name: collector-k8s-noprom
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/collector-k8s-noprom-0.1.1/collector-k8s-noprom-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-08-04T19:34:24.24420199Z"
     description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
     digest: 2bc60e6e7c56a3241e24205479dc0f931b4e25e3bfdaa0671c149ca4049376ec
@@ -12,6 +22,26 @@ entries:
     - https://github.com/lightstep/otel-collector-charts/releases/download/collector-k8s-noprom-0.1.0/collector-k8s-noprom-0.1.0.tgz
     version: 0.1.0
   kube-otel-stack:
+  - apiVersion: v2
+    appVersion: 0.80.0
+    created: "2023-08-15T17:43:58.31989868Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: d5b0ba59ed679222c67ddc6646245f06c8a7d20db351de0937aecdac7f810ef0
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.2.16/kube-otel-stack-0.2.16.tgz
+    version: 0.2.16
   - apiVersion: v2
     appVersion: 0.80.0
     created: "2023-07-12T21:32:32.292350072Z"
@@ -275,4 +305,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2023-08-04T19:34:24.24423159Z"
+generated: "2023-08-15T17:43:58.321283688Z"
