@@ -262,7 +262,7 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.80.0
+  image: otel/opentelemetry-collector-contrib:0.83.0
   enabled: false
   mode: daemonset
   resources:
@@ -398,6 +398,7 @@ logsCollector:
                 name: k8s.pod.name
         extract:
           metadata:
+            - k8s.cluster.uid
             - k8s.namespace.name
             - k8s.pod.name
             - k8s.pod.uid
