@@ -1,7 +1,7 @@
 collectors:
   # collect kubelet stats from each node
   - name: kubelet-stats
-    image: otel/opentelemetry-collector-contrib:0.81.0
+    image: otel/opentelemetry-collector-contrib:0.83.0
     enabled: true
     mode: daemonset
     resources:
@@ -75,6 +75,7 @@ collectors:
               - k8s.cronjob.name
               - k8s.statefulset.name
               - k8s.statefulset.uid
+              - k8s.cluster.uid
         memory_limiter:
           check_interval: 1s
           limit_mib: 2000
@@ -106,7 +107,7 @@ collectors:
 
   # collect cluster-level metrics
   - name: cluster-stats
-    image: otel/opentelemetry-collector-contrib:0.80.0
+    image: otel/opentelemetry-collector-contrib:0.83.0
     replicas: 1
     enabled: true
     resources:
@@ -145,6 +146,10 @@ collectors:
           auth_type: serviceAccount
 
       processors:
+        k8sattributes:
+          extract:
+            metadata:
+              - k8s.cluster.uid
         resourcedetection/env:
           detectors: [env]
           timeout: 2s
@@ -176,5 +181,5 @@ collectors:
             exporters: [otlp]
           metrics/k8s_cluster:
             receivers: [k8s_cluster]
-            processors: [memory_limiter, resourcedetection/env, batch]
+            processors: [memory_limiter, resourcedetection/env, k8sattributes, batch]
             exporters: [otlp, logging]
