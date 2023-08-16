@@ -1,0 +1,208 @@
+{{ $collectorList := concat .Values.collectors (list .Values.daemonCollector .Values.clusterCollector) }}
+{{ range $_, $collector := $collectorList -}}
+{{ if $collector.enabled }}
+{{ $collectorName := (print $.Release.Name "-" $collector.name) }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "{{ $collectorName }}"
+  {{- with $collector.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+  labels:
+    app: {{ $collectorName }}
+    {{- include "kube-otel-stack.labels" $ | indent 4 }}
+spec:
+  {{- if $collector.nodeSelector }}
+  nodeSelector:
+    {{- $collector.nodeSelector | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $collector.tolerations }}
+  tolerations:
+    {{- $collector.tolerations | toYaml | nindent 4 }}
+  {{- end }}
+  mode: {{ $collector.mode }}
+  image: {{ $collector.image }}
+  {{- if not (eq $collector.mode "daemonset") }}
+  replicas: {{ $collector.replicas | default 1 }}
+  {{- end }}
+  {{- if $collector.hpa }}
+  autoscaler:
+    minReplicas: {{ $collector.hpa.minReplicas }}
+    maxReplicas: {{ $collector.hpa.maxReplicas }}
+    targetMemoryUtilization: {{ $collector.hpa.targetMemoryUtilization }}
+    {{- if $collector.hpa.targetCPUUtilization }}
+    targetCPUUtilization: {{ $collector.hpa.targetCPUUtilization }}
+    {{- end }}
+  {{- end }}
+  {{- with $collector.podAnnotations }}
+  podAnnotations:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+{{- if $collector.targetallocator }}
+{{- if $collector.targetallocator.enabled }}
+  targetAllocator:
+    enabled: true
+    image: {{ $collector.targetallocator.image }}
+    replicas: {{ $collector.targetallocator.replicas }}
+    allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
+    {{- if $collector.targetallocator.resources }}
+    resources:
+      {{- toYaml $collector.targetallocator.resources | nindent 6 }}
+    {{- end }}
+    {{- if $collector.targetallocator.filterStrategy }}
+    filterStrategy: {{ $collector.targetallocator.filterStrategy }}
+    {{- end }}
+    {{- if $collector.targetallocator.prometheusCR.enabled }}
+    prometheusCR:
+      {{- with $collector.targetallocator.prometheusCR }}
+      {{- toYaml .  | nindent 6 }}
+      {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}
+  volumeMounts:
+    {{- if $collector.mountHostFS }}
+    # This is assuming the hostmetrics receiver/something is on.
+    - name: hostfs
+      mountPath: /hostfs
+      readOnly: true
+      mountPropagation: HostToContainer
+    {{- end }}
+  volumes:
+    {{- if $collector.mountHostFS }}
+    - name: hostfs
+      hostPath:
+        path: /
+    {{- end }}
+  env:
+    {{- if or $collector.env $.Values.extraEnvs }}
+    {{- toYaml (concat $.Values.extraEnvs $collector.env) | nindent 4 }}
+    {{- end }}
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+  config: |
+    exporters:
+      {{- toYaml $collector.config.exporters | nindent 6 }}
+    receivers:
+      {{- if $collector.scrape_configs_file }}
+      prometheus/file:
+        config:
+          scrape_configs:
+          {{- if $collector.scrape_configs_file }}
+          {{ tpl ($.Files.Get $collector.scrape_configs_file) $ | nindent 10 }}
+          {{- end }}
+      {{- end }}
+      {{- toYaml $collector.config.receivers | nindent 6 }}
+    processors:
+      {{- toYaml $collector.config.processors | nindent 6 }}
+    service:
+      {{- toYaml $collector.config.service | nindent 6 }}
+  resources:
+    {{- toYaml $collector.resources | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "{{ $collectorName }}"
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ $collectorName }}"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "{{ $collectorName }}"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "{{ $collectorName }}-collector"
+  namespace: {{ $.Release.Namespace }}
+---
+{{ end }}
+{{- end }}
