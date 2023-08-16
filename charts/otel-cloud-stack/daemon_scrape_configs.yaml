@@ -67,12 +67,11 @@
   job_name: kubelet
   kubernetes_sd_configs:
   - follow_redirects: true
-    kubeconfig_file: ''
     role: node
-    selectors:
-    - role: node
-      # only scrape data from pods running on the same node as collector
-      field: "metadata.name=$K8S_NODE_NAME"
+    # selectors:
+    # - role: node
+    #   # only scrape data from pods running on the same node as collector
+    #   field: "metadata.name=$K8S_NODE_NAME"
   metric_relabel_configs:
   - action: drop
     regex: container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)
