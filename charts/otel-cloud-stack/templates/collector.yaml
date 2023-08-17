@@ -120,6 +120,11 @@ spec:
     processors:
       {{- toYaml $collector.config.processors | nindent 6 }}
     service:
+      {{- if $.Values.debug }}
+      telemetry:
+        logs:
+          level: "debug"
+      {{- end }}
       {{- toYaml $collector.config.service | nindent 6 }}
   resources:
     {{- toYaml $collector.resources | nindent 4 }}

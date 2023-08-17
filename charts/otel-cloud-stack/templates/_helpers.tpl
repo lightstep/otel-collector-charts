@@ -49,8 +49,6 @@ app.kubernetes.io/part-of: {{ template "kube-otel-stack.name" . }}
 chart: {{ template "kube-otel-stack.chartref" . }}
 release: {{ $.Release.Name | quote }}
 heritage: {{ $.Release.Service | quote }}
-cost_environment: {{.Release.Namespace}}
-cost_function: saas
 {{- if .Values.commonLabels}}
 {{ toYaml .Values.commonLabels }}
 {{- end }}

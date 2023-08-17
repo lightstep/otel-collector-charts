@@ -1,4 +1,5 @@
 extraEnvs: []
+debug: true
 
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
@@ -214,9 +215,6 @@ daemonCollector:
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
     service:
-      telemetry:
-        logs:
-          # level: "debug"
       pipelines:
         metrics:
           exporters:
