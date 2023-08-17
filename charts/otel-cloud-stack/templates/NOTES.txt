@@ -9,7 +9,7 @@
 - Your cluster is now sending metrics to ServiceNow Cloud Observability!
 
 - View collector logs by running:
-  kubectl logs deployment/collector-k8s-noprom-cluster-stats-collector
+  kubectl logs deployment/otel-cloud-stack-cluster-stats-collector
 
 - Create a ServiceNow Cloud Observability dashboard to visualize your metrics
   by visiting: https://app.lightstep.com

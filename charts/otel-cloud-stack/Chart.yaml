@@ -1,5 +1,5 @@
 apiVersion: v2
-name: collector-k8s-noprom
+name: otel-cloud-stack
 description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
 
 # A chart can be either an 'application' or a 'library' chart.
