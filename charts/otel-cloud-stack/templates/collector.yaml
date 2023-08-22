@@ -84,6 +84,10 @@ spec:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
     - name: K8S_NAMESPACE
       valueFrom:
         fieldRef:
