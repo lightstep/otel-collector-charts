@@ -143,6 +143,11 @@ metricsCollector:
   enabled: true
   mode: statefulset
   replicas: 3
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetMemoryUtilization: 70
   targetallocator:
     enabled: true
     allocationStrategy: "consistent-hashing"
