@@ -16,6 +16,15 @@ spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
   replicas: {{ $collector.replicas | default 1 }}
+  {{- if and $collector.hpa $collector.hpa.enabled }}
+  autoscaler:
+    minReplicas: {{ $collector.hpa.minReplicas }}
+    maxReplicas: {{ $collector.hpa.maxReplicas }}
+    targetMemoryUtilization: {{ $collector.hpa.targetMemoryUtilization }}
+    {{- if $collector.hpa.targetCPUUtilization }}
+    targetCPUUtilization: {{ $collector.hpa.targetCPUUtilization }}
+    {{- end }}
+  {{- end }}
   {{- with $collector.podAnnotations }}
   podAnnotations:
     {{- toYaml . | nindent 4}}
