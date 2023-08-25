@@ -439,11 +439,6 @@ logsCollector:
             action: insert
 
     exporters:
-      elasticsearch:
-        endpoints: ["https://logingest.lightstep.com"]
-        index: "lightstep"
-        headers:
-          "lightstep-access-token": "${LS_TOKEN}"
       otlp:
         endpoint: ingest.lightstep.com:443
         headers:
@@ -459,7 +454,7 @@ logsCollector:
             - resourcedetection/env
             - k8sattributes
             - batch
-          exporters: [elasticsearch]
+          exporters: [otlp]
         # include self-scraped metrics, see `templates/collector.yaml` for `prometheus` receiver definition
         metrics:
           receivers: [prometheus]
