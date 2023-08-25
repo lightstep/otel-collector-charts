@@ -40,6 +40,10 @@ spec:
     image: {{ $collector.targetallocator.image }}
     replicas: {{ $collector.targetallocator.replicas }}
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
+    {{- if $collector.targetallocator.resources }}
+    resources:
+      {{- toYaml $collector.targetallocator.resources | nindent 6 }}
+    {{- end }}
     {{- if $collector.targetallocator.filterStrategy }}
     filterStrategy: {{ $collector.targetallocator.filterStrategy }}
     {{- end }}
