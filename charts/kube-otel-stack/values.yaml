@@ -155,13 +155,14 @@ metricsCollector:
     image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.80.0
     prometheusCR:
       enabled: true
-    resources:
-      limits:
-        cpu: 200m
-        memory: 500Mi
-      requests:
-        cpu: 100m
-        memory: 250Mi
+    # Override Default targetAllocator resources
+    # resources:
+    #   limits:
+    #     cpu: 200m
+    #     memory: 500Mi
+    #   requests:
+    #     cpu: 100m
+    #     memory: 250Mi
   # No need for a scrape config when using prometheusCRs
   scrape_configs_file: "scrape_configs.yaml"
   resources:
