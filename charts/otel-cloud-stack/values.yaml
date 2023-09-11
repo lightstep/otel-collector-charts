@@ -618,14 +618,6 @@ logsCollector:
             - k8s.statefulset.uid
             - container.image.tag
             - container.image.name
-      resource:
-        attributes:
-          - key: lightstep.helm_chart
-            value: kube-otel-stack
-            action: insert
-          - key: collector.name
-            value: "${KUBE_POD_NAME}"
-            action: insert
 
     exporters:
       otlp:
