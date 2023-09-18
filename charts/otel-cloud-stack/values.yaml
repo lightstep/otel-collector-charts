@@ -38,6 +38,7 @@ autoinstrumentation:
 
 daemonCollector:
   name: daemon
+  clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.83.0
   enabled: true
   mode: daemonset
@@ -233,6 +234,7 @@ daemonCollector:
 # This is a singleton collector for cluster-level data
 clusterCollector:
   name: cluster-stats
+  clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.83.0
   replicas: 1
   enabled: true
