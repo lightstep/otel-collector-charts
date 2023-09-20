@@ -237,6 +237,7 @@ clusterCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.83.0
   replicas: 1
+  mode: deployment
   enabled: true
   mountHostFS: true
   resources:
