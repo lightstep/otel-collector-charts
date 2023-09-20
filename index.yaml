@@ -345,6 +345,16 @@ entries:
   otel-cloud-stack:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-09-20T17:38:26.843053284Z"
+    description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
+    digest: e4ddc2b18c8e94f781a24444f41bea52668dd95656ab36ea0b7c31577c34f65d
+    name: otel-cloud-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otel-cloud-stack-0.1.4/otel-cloud-stack-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-09-18T20:09:56.757876512Z"
     description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
     digest: 2964488ad68343f000258a2d90b3736b61628651395973003fc654c2c57df159
@@ -396,4 +406,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2023-09-18T20:09:56.758125216Z"
+generated: "2023-09-20T17:38:26.843102789Z"
