@@ -12,7 +12,7 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
-    {{- include "kube-otel-stack.labels" $ | indent 4 }}
+    {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
   {{- if $collector.nodeSelector }}
   nodeSelector:

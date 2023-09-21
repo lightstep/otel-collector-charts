@@ -113,9 +113,6 @@ tracesCollector:
           - key: lightstep.helm_chart
             value: kube-otel-stack
             action: insert
-          - key: collector.name
-            value: "${KUBE_POD_NAME}"
-            action: insert
 
     exporters:
       otlp:
@@ -243,9 +240,6 @@ metricsCollector:
         attributes:
           - key: lightstep.helm_chart
             value: kube-otel-stack
-            action: insert
-          - key: collector.name
-            value: "${KUBE_POD_NAME}"
             action: insert
           - key: job
             from_attribute: service.name
@@ -433,9 +427,6 @@ logsCollector:
         attributes:
           - key: lightstep.helm_chart
             value: kube-otel-stack
-            action: insert
-          - key: collector.name
-            value: "${KUBE_POD_NAME}"
             action: insert
 
     exporters:
