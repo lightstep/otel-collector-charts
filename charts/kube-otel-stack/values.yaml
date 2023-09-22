@@ -145,7 +145,7 @@ tracesCollector:
         # the OTel-Arrow exporter without a queue, it has to do with
         # requiring the "num_consumers" limit configured in this
         # section (i.e., we require a queue in order to limit the
-        # number of concurrent exports.
+        # number of concurrent exports).
         #
         # Note that the queue settings are applied in unit-terms
         # produced by the batch processor, so a number like 100 means
