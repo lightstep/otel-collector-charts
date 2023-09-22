@@ -70,10 +70,6 @@ tracesCollector:
           grpc:
             endpoint: "0.0.0.0:4317"
     processors:
-      memory_limiter:
-        check_interval: 1s
-        limit_percentage: 75
-        spike_limit_percentage: 30
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
@@ -125,7 +121,6 @@ tracesCollector:
         traces:
           receivers: [otlp]
           processors:
-            - memory_limiter
             - resource
             - resourcedetection/env
             - k8sattributes
@@ -190,10 +185,6 @@ metricsCollector:
           grpc:
             endpoint: "0.0.0.0:4317"
     processors:
-      memory_limiter:
-        check_interval: 1s
-        limit_percentage: 75
-        spike_limit_percentage: 30
       metricstransform/k8sservicename:
         transforms:
           - include: kube_service_info
@@ -258,7 +249,6 @@ metricsCollector:
         metrics:
           receivers: [prometheus, otlp]
           processors:
-            - memory_limiter
             - resource
             - resourcedetection/env
             - k8sattributes
@@ -376,10 +366,6 @@ logsCollector:
             from: attributes.uid
             to: resource["k8s.pod.uid"]
     processors:
-      memory_limiter:
-        check_interval: 1s
-        limit_percentage: 75
-        spike_limit_percentage: 30
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
@@ -440,7 +426,6 @@ logsCollector:
         logs:
           receivers: [k8s_events, filelog]
           processors:
-            - memory_limiter
             - resource
             - resourcedetection/env
             - k8sattributes
@@ -450,7 +435,6 @@ logsCollector:
         metrics:
           receivers: [prometheus]
           processors:
-            - memory_limiter
             - resource
             - resourcedetection/env
             - k8sattributes

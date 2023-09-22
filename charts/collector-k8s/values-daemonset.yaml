@@ -24,9 +24,6 @@ collectors:
             grpc:
               endpoint: "0.0.0.0:4317"
       processors:
-        memory_limiter:
-          check_interval: 1s
-          limit_mib: 2000
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -46,7 +43,7 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, batch]
+            processors: [resourcedetection/gke, batch]
             exporters: [otlp]
 
   # The daemonset collector should be configured to scrape general app metrics that contains `prometheus.io/scrape: true` annotation.
@@ -75,9 +72,6 @@ collectors:
             grpc:
               endpoint: "0.0.0.0:4317"
       processors:
-        memory_limiter:
-          check_interval: 1s
-          limit_mib: 2000
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -97,5 +91,5 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, batch]
+            processors: [resourcedetection/gke, batch]
             exporters: [otlp]

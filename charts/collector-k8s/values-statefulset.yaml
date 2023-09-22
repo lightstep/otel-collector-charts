@@ -30,9 +30,6 @@ collectors:
             grpc:
               endpoint: "0.0.0.0:4317"
       processors:
-        memory_limiter:
-          check_interval: 1s
-          limit_percentage: 75
         resourcedetection/gke:
           detectors: [env, gke]
           timeout: 2s
@@ -57,5 +54,5 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, resourcedetection/gke, resource, batch]
+            processors: [resourcedetection/gke, resource, batch]
             exporters: [otlp]
