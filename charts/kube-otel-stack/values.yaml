@@ -56,6 +56,19 @@ tracesCollector:
   mode: deployment
   replicas: 1
   resources:
+    # OTel-Arrow notes: to use OTel-Arrow in a gateway configuration,
+    # we recommend the following adjustments:
+    # 
+    # limits:
+    #   cpu: 2000m
+    #   memory: 8Gi
+    # requests:
+    #   cpu: 1500m
+    #   memory: 6Gi
+    #
+    # OTel-Arrow gateways with this resource configuration have been
+    # exercised at rates above 20,000 spans per second in our internal
+    # production setup, for reference.
     limits:
       cpu: 250m
       memory: 250Mi
