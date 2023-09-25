@@ -6,7 +6,7 @@ This is the repository for Lightstep's recommended [Helm](https://helm.sh/) char
 
 ## Charts
 
-* [collector-k8s](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/collector-k8s) - Chart for using the OpenTelemetry Collector to scape static or dynamic metric targets.
+* [collector-k8s](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/collector-k8s) - Chart for using the OpenTelemetry Collector to scrape static or dynamic metric targets.
 * [kube-otel-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/kube-otel-stack) - Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry Operator.
 * [otel-cloud-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/otel-cloud-stack) - Chart for sending Kubernetes metrics to Lightstep using Otel native metric collection and the OpenTelemetry Operator.
 
