@@ -2,7 +2,7 @@ apiVersion: v2
 name: otelcollector
 description: Chart for using the OpenTelemetry Collector to scape static or dynamic metric targets.
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: 0.83.0
 dependencies:
 # cert manager must be manually installed because it has CRDs
