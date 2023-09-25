@@ -24,10 +24,6 @@ collectors:
             grpc:
               endpoint: "0.0.0.0:4317"
       processors:
-        memory_limiter:
-          check_interval: 1s
-          limit_percentage: 75
-          spike_limit_percentage: 30
         batch:
           send_batch_size: 1000
           timeout: 1s
@@ -43,9 +39,9 @@ collectors:
         pipelines:
           metrics:
             receivers: [prometheus]
-            processors: [memory_limiter, batch]
+            processors: [batch]
             exporters: [otlp]
           traces:
             receivers: [otlp]
-            processors: [memory_limiter, batch]
+            processors: [batch]
             exporters: [otlp]
