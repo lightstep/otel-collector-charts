@@ -12,7 +12,7 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
-    {{- include "kube-otel-stack.labels" $ | indent 4 }}
+    {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
   {{- if $collector.nodeSelector }}
   nodeSelector:
@@ -114,6 +114,8 @@ spec:
         fieldRef:
           apiVersion: v1
           fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name={{ $collector.clusterName | default "unknown" }}"
   config: |
     exporters:
       {{- toYaml $collector.config.exporters | nindent 6 }}
