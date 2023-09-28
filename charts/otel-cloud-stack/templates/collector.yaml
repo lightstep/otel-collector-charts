@@ -1,4 +1,4 @@
-{{ $collectorList := concat .Values.collectors (list .Values.daemonCollector .Values.clusterCollector .Values.tracesCollector) }}
+{{ $collectorList := concat .Values.collectors (list .Values.daemonCollector .Values.clusterCollector .Values.tracesCollector .Values.logsCollector ) }}
 {{ range $_, $collector := $collectorList -}}
 {{ if $collector.enabled }}
 {{ $collectorName := (print $.Release.Name "-" $collector.name) }}
@@ -70,12 +70,18 @@ spec:
       readOnly: true
       mountPropagation: HostToContainer
     {{- end }}
+    {{- if $collector.volumeMounts }}
+      {{- toYaml $collector.volumeMounts | nindent 4 }}
+    {{- end }}
   volumes:
     {{- if $collector.mountHostFS }}
     - name: hostfs
       hostPath:
         path: /
     {{- end }}
+    {{- if $collector.volumes }}
+      {{- toYaml $collector.volumes | nindent 4 }}
+    {{ end }}
   env:
     {{- if or $collector.env $.Values.extraEnvs }}
     {{- toYaml (concat $.Values.extraEnvs $collector.env) | nindent 4 }}
