@@ -115,8 +115,8 @@ spec:
           apiVersion: v1
           fieldPath: status.podIP
     - name: OTEL_RESOURCE_ATTRIBUTES
-      {{- if eq $collector.mode "daemonset" }}
-      value: "k8s.cluster.name={{ $collector.clusterName | default "unknown" }},k8s.node.name=$(K8S_NODE_NAME)"
+      {{- if (eq $collector.mode "daemonset") }}
+      value: "k8s.cluster.name={{ $collector.clusterName | default $.Values.clusterName }},k8s.node.name=$(K8S_NODE_NAME)"
       {{- else }}
       value: "k8s.cluster.name={{ $collector.clusterName | default $.Values.clusterName }}"
       {{- end }}

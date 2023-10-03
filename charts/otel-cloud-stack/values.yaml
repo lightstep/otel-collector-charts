@@ -84,7 +84,10 @@ daemonCollector:
         collection_interval: "30s"
         root_path: /hostfs
         scrapers:
-          cpu: {}
+          cpu:
+            metrics:
+              system.cpu.utilization:
+                enabled: true
           disk: {}
           load: {}
           filesystem:
