@@ -51,7 +51,7 @@ tracesCollector:
   # OTel-Arrow notes: to use OTel-Arrow requires an image with the
   # OTel-Arrow components built in.  The collector-contrib image
   # does not include these components yet, so a custom image will be
-  # needed.  See
+  # needed.  See https://github.com/lightstep/otel-collector-charts/blob/main/gateway-build.yaml
   image: otel/opentelemetry-collector-contrib:0.83.0
   mode: deployment
   replicas: 1
@@ -221,22 +221,21 @@ tracesCollector:
         timeout: 30s
 
         # OTel-Arrow notes: these settings are specific to OTel-Arrow.
-        # To return this configuration to the standard OTLP exporter,
-        # replace "otelarrow" with "otlp" above and remove the "arrow"
-        # section below.
-        arrow:
+        # To use this configuration, replace "otlp" with "otelarrow" above
+        # and uncomment below.
+        #arrow:
           # This prevents the OTel-Arrow exporter from falling back to
           # standard OTLP in case of misconfiguration.
-          disable_downgrade: true
+          #disable_downgrade: true
 
           # We recommend a small number of streams, since they consume
           # substantial resources.  More than one stream is recommended
           # to help balance load.
-          num_streams: 2
+          #num_streams: 2
 
           # A stream lifetime limit is required to avoid spurious
           # disconnect error messages in the collector logs.
-          max_stream_lifetime: 4m30s
+          #max_stream_lifetime: 4m30s
 
     service:
       pipelines:
