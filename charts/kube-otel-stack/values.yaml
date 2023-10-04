@@ -51,14 +51,14 @@ tracesCollector:
   # OTel-Arrow notes: to use OTel-Arrow requires an image with the
   # OTel-Arrow components built in.  The collector-contrib image
   # does not include these components yet, so a custom image will be
-  # needed.  See 
+  # needed.  See
   image: otel/opentelemetry-collector-contrib:0.83.0
   mode: deployment
   replicas: 1
   resources:
     # OTel-Arrow notes: to use OTel-Arrow in a gateway configuration,
     # we recommend the following adjustments:
-    # 
+    #
     # limits:
     #   cpu: 2000m
     #   memory: 8Gi
