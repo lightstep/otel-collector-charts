@@ -1,5 +1,6 @@
 extraEnvs: []
 debug: false
+clusterName: "unknown"
 
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
@@ -39,7 +40,7 @@ autoinstrumentation:
 daemonCollector:
   name: daemon
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.83.0
+  image: otel/opentelemetry-collector-contrib:0.85.0
   enabled: true
   mode: daemonset
   mountHostFS: true
@@ -51,10 +52,10 @@ daemonCollector:
           name: otel-collector-secret
   resources:
     limits:
-      cpu: 250m
-      memory: 500Mi
+      cpu: 100m
+      memory: 250Mi
     requests:
-      cpu: 250m
+      cpu: 100m
       memory: 128Mi
   scrape_configs_file: "daemon_scrape_configs.yaml"
   config:
@@ -84,9 +85,15 @@ daemonCollector:
         root_path: /hostfs
         scrapers:
           cpu:
-          disk:
-          load:
+            metrics:
+              system.cpu.utilization:
+                enabled: true
+          disk: {}
+          load: {}
           filesystem:
+            metrics:
+              system.filesystem.utilization:
+                enabled: true
             exclude_mount_points:
               match_type: regexp
               mount_points:
@@ -124,10 +131,13 @@ daemonCollector:
                 - sysfs
                 - tracefs
           memory:
+            metrics:
+              system.memory.utilization:
+                enabled: true
           # paging:
           # processes:
           # process:
-          network:
+          network: {}
     processors:
       resourcedetection/env:
         detectors: [env]
@@ -230,17 +240,17 @@ daemonCollector:
 clusterCollector:
   name: cluster-stats
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.83.0
+  image: otel/opentelemetry-collector-contrib:0.85.0
   replicas: 1
   mode: deployment
   enabled: true
-  mountHostFS: true
+  mountHostFS: false
   resources:
     limits:
-      cpu: 250m
+      cpu: 100m
       memory: 500Mi
     requests:
-      cpu: 250m
+      cpu: 100m
       memory: 500Mi
   env:
     - name: LS_TOKEN
@@ -350,7 +360,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.83.0
+  image: otel/opentelemetry-collector-contrib:0.85.0
   mode: deployment
   hpa:
     minReplicas: 1
@@ -464,15 +474,15 @@ logsCollector:
   enabled: false
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.83.0
+  image: otel/opentelemetry-collector-contrib:0.85.0
   mode: daemonset
   resources:
     limits:
-      cpu: 250m
+      cpu: 100m
       memory: 250Mi
     requests:
-      cpu: 250m
-      memory: 250Mi
+      cpu: 100m
+      memory: 128Mi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -620,7 +630,6 @@ logsCollector:
           receivers: [k8s_events, filelog]
           processors:
             - memory_limiter
-            - resource
             - resourcedetection/env
             - k8sattributes
             - batch
