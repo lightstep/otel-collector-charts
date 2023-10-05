@@ -47,6 +47,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
+
   image: otel/opentelemetry-collector-contrib:0.83.0
   mode: deployment
   replicas: 1
@@ -69,15 +70,45 @@ tracesCollector:
         protocols:
           grpc:
             endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
     processors:
+      # We recommend use of the batch processor.  We recommend the settings
+      # below for traces.
+      #
+      # Note: We are aware of ongoing efforts within OpenTelemetry to
+      # configure batching in the exporter, where it is possible to
+      # configure batch size limits in terms of bytes, instead of items.
+      # We will update these recommendations when batching by size is
+      # available.
+      batch:
+        # In this example, the processor will wait to accumulate at least
+        # 1000 spans for up to 1 second, then flush the batch.  In cases
+        # where the arriving data is already batched, such that combining
+        # the pending batch with the arriving data would exceed 1500
+        # items, then 1500 items will be sent by splitting the data.
+        #
+        # Note: the batch processor has a side-effect of returning success
+        # to the producer, before waiting for the consumer to respond.
+        # This is appropriate default in most cases, it means that SDKs
+        # sending to the gateway will not see or report errors.
+        #
+        # The batch processor responds to "back-pressure" from the
+        # exporter, meaning it is never directly responsible for dropping
+        # spans.  Note that our current recommendation for exporter
+        # settings does not respond with back-pressure to the batch
+        # processor.  Due to exporter settings, this collector
+        # configuration will drop data when the ServiceNow service is
+        # (intentionally or accidentally) refusing data, instead of
+        # applying pressure backward, discussed in the `exporters`
+        # section.
+        send_batch_size: 1000
+        send_batch_max_size: 1500
+        timeout: 1s
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
         override: false
-      batch:
-        send_batch_size: 1000
-        timeout: 1s
-        send_batch_max_size: 1500
       k8sattributes:
         passthrough: false
         pod_association:
@@ -115,6 +146,48 @@ tracesCollector:
         endpoint: ingest.lightstep.com:443
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
+
+        # Queue settings are required.  It does not make sense to use
+        # the exporter without a queue, it has to do with
+        # requiring the "num_consumers" limit configured in this
+        # section (i.e., we require a queue in order to limit the
+        # number of concurrent exports).
+        #
+        # Note that the queue settings are applied in unit-terms
+        # produced by the batch processor, so a number like 100 means
+        # the queue has support for 100 pre-batched items.  With up to
+        # 1500 spans each (from the batch processor), this
+        # configuration allows 150,000 spans to occupy memory.
+        queue_settings:
+          enabled: true
+          num_consumers: 4
+          queue_size: 100
+
+        # Retry settings are optional.
+        #
+        # Note that while retries are attempted, this component will
+        # begin to drop arriving data if the queue is not large
+        # enough.
+        retry_on_failure:
+          # We recommend disabling retries, since while the export is
+          # blocked it is likely that arriving spans will drop, and
+          # Otherwise, collectors will need substantial additional
+          # memory to survive transient failures.  Nevertheless, we
+          # recommend a limited retry policy to gracefully occasional
+          # failures, paired with a modest queue size.
+          #
+          # Note there is a persistent storage option inherited from a
+          # common collector component.  When persistent storage is
+          # configured, the default retry configuration is sensible.
+          #
+          # For more details on retry and queue settings, please refer to
+          # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
+          enabled: true
+          max_elapsed_time: 60s
+
+        # While we expect latency under one second, typically, we
+        # recommend a longer timeout than the default.
+        timeout: 30s
 
     service:
       pipelines:

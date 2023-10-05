@@ -1,0 +1,52 @@
+# This is a BETA feature, please use at your own risk.
+# OTel-Arrow notes: to use OTel-Arrow requires an image with the
+# OTel-Arrow components built in.  The collector-contrib image
+# does not include these components yet, so a custom image will be
+# needed.  See https://github.com/lightstep/otel-collector-charts/blob/main/gateway-build.yaml
+tracesCollector:
+  image: "your-image-with-arrow-here"
+  resources:
+    # OTel-Arrow notes: to use OTel-Arrow in a gateway configuration,
+    # we recommend the following adjustments:
+    #
+    #
+    # OTel-Arrow gateways with this resource configuration have been
+    # exercised at rates above 20,000 spans per second in our internal
+    # production setup, for reference.
+    limits:
+      cpu: 2000m
+      memory: 8Gi
+    requests:
+      cpu: 1500m
+      memory: 6Gi
+  config:
+    receivers:
+      otelarrow:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+    exporters:
+      otelarrow:
+        # OTel-Arrow notes: To use OTel-Arrow during early-access
+        # specifically requires the following endpoint.  This endpoint
+        # supports both OTLP and OTel-Arrow.
+        endpoint: spaningest.lightstep.com:443
+
+        # OTel-Arrow notes: these settings are specific to OTel-Arrow.
+        # To use this configuration, replace "otlp" with "otelarrow" above
+        # and uncomment below.
+        arrow:
+          # This prevents the OTel-Arrow exporter from falling back to
+          # standard OTLP in case of misconfiguration.
+          disable_downgrade: true
+
+          # We recommend a small number of streams, since they consume
+          # substantial resources.  More than one stream is recommended
+          # to help balance load.
+          num_streams: 2
+
+          # A stream lifetime limit is required to avoid spurious
+          # disconnect error messages in the collector logs.
+          max_stream_lifetime: 4m30s
