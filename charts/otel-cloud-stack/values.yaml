@@ -39,10 +39,6 @@ autoinstrumentation:
 daemonCollector:
   name: daemon
   clusterName: ""
-  # OTel-Arrow notes: to use OTel-Arrow requires an image with the
-  # OTel-Arrow components built in.  The collector-contrib image
-  # does not include these components yet, so a custom image will be
-  # needed.  See https://github.com/lightstep/otel-collector-charts/blob/main/gateway-build.yaml
   image: otel/opentelemetry-collector-contrib:0.83.0
   enabled: true
   mode: daemonset
@@ -54,19 +50,6 @@ daemonCollector:
           key: LS_TOKEN
           name: otel-collector-secret
   resources:
-    # OTel-Arrow notes: to use OTel-Arrow in a gateway configuration,
-    # we recommend the following adjustments:
-    #
-    # limits:
-    #   cpu: 2000m
-    #   memory: 8Gi
-    # requests:
-    #   cpu: 1500m
-    #   memory: 6Gi
-    #
-    # OTel-Arrow gateways with this resource configuration have been
-    # exercised at rates above 20,000 spans per second in our internal
-    # production setup, for reference.
     limits:
       cpu: 250m
       memory: 500Mi
@@ -258,32 +241,10 @@ daemonCollector:
         verbosity: detailed
         sampling_initial: 5
         sampling_thereafter: 200
-      # OTel-Arrow notes: To use OTel-Arrow requires an image that
-      # contains the OTel-Arrow exporter component.  When the image
-      # supports OTel-Arrow the "otlp" component name can be replaced
-      # with "otelarrow".  The non-Arrow configuration is identical
-      # between these components.
       otlp:
-        # OTel-Arrow notes: To use OTel-Arrow during early-access
-        # specifically requires the following endpoint.  This endpoint
-        # supports both OTLP and OTel-Arrow.
-        endpoint: spaningest.lightstep.com:443
+        endpoint: ingest.lightstep.com:443
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
-
-        # OTel-Arrow notes:
-        #
-        # Queue settings are required.  It does not make sense to use
-        # the OTel-Arrow exporter without a queue, it has to do with
-        # requiring the "num_consumers" limit configured in this
-        # section (i.e., we require a queue in order to limit the
-        # number of concurrent exports).
-        #
-        # Note that the queue settings are applied in unit-terms
-        # produced by the batch processor, so a number like 100 means
-        # the queue has support for 100 pre-batched items.  With up to
-        # 1500 spans each (from the batch processor), this
-        # configuration allows 150,000 spans to occupy memory.
         queue_settings:
           enabled: true
           num_consumers: 4
@@ -314,23 +275,6 @@ daemonCollector:
         # While we expect latency under one second, typically, we
         # recommend a longer timeout than the default.
         timeout: 30s
-
-        # OTel-Arrow notes: these settings are specific to OTel-Arrow.
-        # To use this configuration, replace "otlp" with "otelarrow" above
-        # and uncomment below.
-        #arrow:
-          # This prevents the OTel-Arrow exporter from falling back to
-          # standard OTLP in case of misconfiguration.
-          #disable_downgrade: true
-
-          # We recommend a small number of streams, since they consume
-          # substantial resources.  More than one stream is recommended
-          # to help balance load.
-          #num_streams: 2
-
-          # A stream lifetime limit is required to avoid spurious
-          # disconnect error messages in the collector logs.
-          #max_stream_lifetime: 4m30s
     service:
       pipelines:
         metrics:
