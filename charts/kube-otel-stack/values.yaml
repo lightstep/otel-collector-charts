@@ -214,7 +214,7 @@ metricsCollector:
   mode: statefulset
   replicas: 3
   hpa:
-    enabled: false
+    enabled: true
     minReplicas: 3
     maxReplicas: 10
     targetMemoryUtilization: 70
@@ -338,7 +338,7 @@ logsCollector:
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.83.0
-  enabled: false
+  enabled: true
   mode: daemonset
   resources:
     limits:
