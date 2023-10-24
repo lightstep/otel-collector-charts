@@ -16,14 +16,16 @@ spec:
   mode: {{ $collector.mode }}
   image: {{ $collector.image }}
   replicas: {{ $collector.replicas | default 1 }}
-  {{- if and $collector.hpa $collector.hpa.enabled }}
+  {{- with $collector.hpa }}
+  {{- if .enabled }}
   autoscaler:
-    minReplicas: {{ $collector.hpa.minReplicas }}
-    maxReplicas: {{ $collector.hpa.maxReplicas }}
-    targetMemoryUtilization: {{ $collector.hpa.targetMemoryUtilization }}
-    {{- if $collector.hpa.targetCPUUtilization }}
-    targetCPUUtilization: {{ $collector.hpa.targetCPUUtilization }}
+    minReplicas: {{ .minReplicas }}
+    maxReplicas: {{ .maxReplicas }}
+    targetMemoryUtilization: {{ .targetMemoryUtilization }}
+    {{- if .targetCPUUtilization }}
+    targetCPUUtilization: {{ .targetCPUUtilization }}
     {{- end }}
+  {{- end }}
   {{- end }}
   {{- with $collector.podAnnotations }}
   podAnnotations:
