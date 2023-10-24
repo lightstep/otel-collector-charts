@@ -68,4 +68,4 @@ jobs:
 
       - name: Run chart-testing otel-cloud-stack (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --config ct.yaml --charts ./charts/otel-cloud-stack ---helm-extra-set-args="-set=tracesCollector.enabled=true --set=logsCollector.enabled=true" --namespace opentelemetry --debug
+        run: ct install --config ct.yaml --charts ./charts/otel-cloud-stack --helm-extra-set-args="--set=tracesCollector.enabled=true --set=logsCollector.enabled=true" --namespace opentelemetry --debug
