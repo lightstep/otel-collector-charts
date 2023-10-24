@@ -214,7 +214,7 @@ metricsCollector:
   mode: statefulset
   replicas: 3
   hpa:
-    enabled: true
+    enabled: false
     minReplicas: 3
     maxReplicas: 10
     targetMemoryUtilization: 70
