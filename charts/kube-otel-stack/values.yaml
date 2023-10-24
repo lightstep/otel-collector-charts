@@ -51,6 +51,11 @@ tracesCollector:
   image: otel/opentelemetry-collector-contrib:0.83.0
   mode: deployment
   replicas: 1
+  hpa:
+    enabled: false
+    minReplicas: 3
+    maxReplicas: 10
+    targetMemoryUtilization: 70
   resources:
     limits:
       cpu: 250m
