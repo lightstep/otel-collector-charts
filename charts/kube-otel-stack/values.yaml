@@ -338,7 +338,7 @@ logsCollector:
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.83.0
-  enabled: true
+  enabled: false
   mode: daemonset
   resources:
     limits:

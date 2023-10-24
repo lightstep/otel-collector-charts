@@ -27,14 +27,16 @@ spec:
   {{- if not (eq $collector.mode "daemonset") }}
   replicas: {{ $collector.replicas | default 1 }}
   {{- end }}
-  {{- if $collector.hpa }}
+  {{- with $collector.hpa }}
+  {{- if .enabled }}
   autoscaler:
-    minReplicas: {{ $collector.hpa.minReplicas }}
-    maxReplicas: {{ $collector.hpa.maxReplicas }}
-    targetMemoryUtilization: {{ $collector.hpa.targetMemoryUtilization }}
-    {{- if $collector.hpa.targetCPUUtilization }}
-    targetCPUUtilization: {{ $collector.hpa.targetCPUUtilization }}
+    minReplicas: {{ .minReplicas }}
+    maxReplicas: {{ .maxReplicas }}
+    targetMemoryUtilization: {{ .targetMemoryUtilization }}
+    {{- if .targetCPUUtilization }}
+    targetCPUUtilization: {{ .targetCPUUtilization }}
     {{- end }}
+  {{- end }}
   {{- end }}
   {{- with $collector.podAnnotations }}
   podAnnotations:
