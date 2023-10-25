@@ -255,7 +255,7 @@ daemonCollector:
         endpoint: ingest.lightstep.com:443
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
-        queue_settings:
+        sending_queue:
           enabled: true
           num_consumers: 4
           queue_size: 100
