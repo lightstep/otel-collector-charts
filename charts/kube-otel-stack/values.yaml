@@ -163,7 +163,7 @@ tracesCollector:
         # the queue has support for 100 pre-batched items.  With up to
         # 1500 spans each (from the batch processor), this
         # configuration allows 150,000 spans to occupy memory.
-        queue_settings:
+        sending_queue:
           enabled: true
           num_consumers: 4
           queue_size: 100
