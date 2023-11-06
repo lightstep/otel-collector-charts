@@ -1,6 +1,6 @@
 extraEnvs: []
 debug: false
-clusterName: "unknown"
+clusterName: "dev-kristina"
 
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
@@ -39,6 +39,8 @@ autoinstrumentation:
 
 daemonCollector:
   name: daemon
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.85.0
   enabled: true
@@ -52,10 +54,10 @@ daemonCollector:
           name: otel-collector-secret
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 250Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
   scrape_configs_file: "daemon_scrape_configs.yaml"
   config:
@@ -303,6 +305,8 @@ daemonCollector:
 # This is a singleton collector for cluster-level data
 clusterCollector:
   name: cluster-stats
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.85.0
   replicas: 1
@@ -421,7 +425,9 @@ clusterCollector:
 
 ## Default collector for tracing
 tracesCollector:
-  enabled: false
+  enabled: true
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.85.0
@@ -535,17 +541,19 @@ tracesCollector:
           exporters: [otlp]
 
 logsCollector:
-  enabled: false
+  enabled: true
+  labels:
+    opentelemetry.io/opamp-reporting: "true"
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.85.0
   mode: daemonset
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 250Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
   env:
     - name: LS_TOKEN
