@@ -182,6 +182,14 @@ rules:
   verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
   verbs: ["get"]
+{{- if $collector.kubeletEvents }}
+- apiGroups: ["events.k8s.io"]
+  resources: ["events"]
+  verbs:
+    - get
+    - list
+    - watch
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
