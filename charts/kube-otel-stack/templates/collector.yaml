@@ -58,7 +58,9 @@ spec:
 {{- end }}
 {{- end }}
   env:
+  {{- if $collector.env }}
     {{- toYaml $collector.env | nindent 4}}
+  {{- end }}
     - name: OTEL_K8S_NODE_NAME
       valueFrom:
         fieldRef:
@@ -182,6 +184,9 @@ rules:
   verbs: ["get", "list", "watch"]
 - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
   verbs: ["get"]
+{{- if $collector.extraRbac }}
+{{ toYaml $collector.extraRbac }}
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
