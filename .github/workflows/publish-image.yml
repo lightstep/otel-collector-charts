@@ -31,8 +31,7 @@ jobs:
         id: read-yaml
         run: |
           # Parse the YAML file and extract the otelcol version
-          OTELCOL_VERSION=$(yq -r '.dist.otelcol_version' ./arrow/otelcolarrow-build.yaml)
-          echo "OTELCOL_VERSION=${OTELCOL_VERSION}" >> $GITHUB_ENV
+          echo "otelcol_version=$(yq -r '.dist.otelcol_version' ./arrow/otelcolarrow-build.yaml)" >> $GITHUB_OUTPUT
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about) to extract tags and labels that will be applied to the specified image. The `id` "meta" allows the output of this step to be referenced in a subsequent step. The `images` value provides the base name for the tags and labels.
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -41,7 +40,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-EXPERIMENTAL
           tags: |
             # Set the OTELCOL_VERSION here
-            echo "::set-output name=otelcol-version-tag::${OTELCOL_VERSION}"
+            type=raw,value=${{ steps.read-yaml.outputs.otelcol_version }}
             # set latest tag for master branch
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
@@ -51,6 +50,7 @@ jobs:
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: ./arrow
-          push: true
+          # Only push to GHCR if this change is off the main branch
+          push: ${{ github.ref == format('refs/heads/{0}', 'main') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
