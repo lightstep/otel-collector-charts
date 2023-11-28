@@ -24,7 +24,7 @@ In order to use an arrow trace collector, you can use  (1) the prebuilt image av
 
 
 ### 2. Build your own custom image
-1.  We have supplied a collector builder config below. 
+1. We have supplied a collector builder config below. 
 2. Once an image is a available, simply apply your desired helm chart with the values.yaml AND the arrow.yaml in the respective chart. 
 3. Make sure to replace the image in arrow.yaml with your custom built image.
 
