@@ -24,6 +24,26 @@ entries:
   kube-otel-stack:
   - apiVersion: v2
     appVersion: 0.83.0
+    created: "2023-11-29T18:15:24.285881898Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: e6b99d851b585f28a183deedf2067cb3bc56d109c40770e75cc0895b2e254b14
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.3.9/kube-otel-stack-0.3.9.tgz
+    version: 0.3.9
+  - apiVersion: v2
+    appVersion: 0.83.0
     created: "2023-11-08T18:39:10.842006523Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
@@ -485,6 +505,16 @@ entries:
   otel-cloud-stack:
   - apiVersion: v2
     appVersion: 1.17.0
+    created: "2023-11-29T18:15:24.546376264Z"
+    description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
+    digest: e8c9d592ba06cc399fc24818dc2785d16647171fd42f09c3cc88e49ea477fb8f
+    name: otel-cloud-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otel-cloud-stack-0.2.9/otel-cloud-stack-0.2.9.tgz
+    version: 0.2.9
+  - apiVersion: v2
+    appVersion: 1.17.0
     created: "2023-11-06T22:58:43.356691825Z"
     description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
     digest: 8f812553b4745378fa4364ea78073009555603004a48817537d0cb2c82325e51
@@ -629,4 +659,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2023-11-08T18:39:10.84222193Z"
+generated: "2023-11-29T18:15:24.546640468Z"
