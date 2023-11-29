@@ -4,7 +4,7 @@
 # does not include these components yet, so a custom image will be
 # needed.  See https://github.com/lightstep/otel-collector-charts/blob/main/gateway-build.yaml
 tracesCollector:
-  image: "your-image-with-arrow-here"
+  image: "ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest"
   resources:
     # OTel-Arrow notes: to use OTel-Arrow in a gateway configuration,
     # we recommend the following adjustments:
