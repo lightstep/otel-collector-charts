@@ -1,3 +1,8 @@
+# This configuration is used to sanity check the build configuration
+# in the directory above.  This is not a useful example configuration
+# for sending to ServiceNow Cloud Observability; for a useful example
+# configuration of the OTel-Arrow components, see ../../charts/*/arrow.yaml.
+
 receivers:
   # otelarrow is an OTel Arrow receiver that will operate as the SaaS-side
   # of the bridge.
