@@ -1,3 +1,6 @@
+# This configuration is used to sanity check the build configuration
+# in the directory above.  
+
 receivers:
   # otelarrow is an OTel Arrow receiver that will operate as the SaaS-side
   # of the bridge.

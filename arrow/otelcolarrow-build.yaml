@@ -28,20 +28,31 @@ dist:
   # Note: This should match the version of the core and contrib
   # collector components used below (e.g., the debugexporter and
   # otlphttpexporter versions below).
-  otelcol_version: 0.89.0
+  otelcol_version: 0.91.0
 
 exporters:
-  # This is the core OpenTelemetry Protocol with Apache Arrow exporter
+  # This is the core OpenTelemetry Protocol with Apache Arrow exporter,
+  # recommended for exporting to ServiceNow Cloud Observability.
   - import: github.com/open-telemetry/otel-arrow/collector/exporter/otelarrowexporter
-    gomod: github.com/open-telemetry/otel-arrow/collector v0.10.0
-  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.89.0
-  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.89.0
+    gomod: github.com/open-telemetry/otel-arrow/collector v0.13.0
+
+  # The following components may be useful for debugging.
+
+  # The debug exporter, useful for printing telemetry to the console.
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.91.0
+  # This is the core OTLP/HTTP exporter, useful for forwarding OTLP/HTTP
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.91.0
+  # This is the core OTLP/gRPC exporter, useful for forwarding OTLP/gRPC.
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.91.0
 
 receivers:
-  # This is the core OpenTelemetry Protocol with Apache Arrow receiver
+  # This is the core OpenTelemetry Protocol with Apache Arrow receiver,
+  # recommended for receiving OTLP/gRPC and OTel-Arrow.
   - import: github.com/open-telemetry/otel-arrow/collector/receiver/otelarrowreceiver
-    gomod: github.com/open-telemetry/otel-arrow/collector v0.10.0
+    gomod: github.com/open-telemetry/otel-arrow/collector v0.13.0
+  # This is the core OTLP receiver, necessary for receiving OTLP/HTTP.
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.91.0
 
 
 extensions:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/headerssetterextension v0.88.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/headerssetterextension v0.91.0
