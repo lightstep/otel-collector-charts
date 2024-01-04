@@ -23,7 +23,7 @@
 #       cpu: 8
 #       memory: 24Gi
 #
-# In the larger configuration tested, we used `max_in_flight_size_mib: 128`.
+# In the larger configuration tested, we used `max_in_flight_size_mib: 256`.
 
 receivers:
   # otelarrow is the OpenTelemetry Protocol with Apache Arrow receiver
