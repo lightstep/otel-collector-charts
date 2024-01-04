@@ -17,10 +17,10 @@ This is the repository for recommended [Helm](https://helm.sh/) charts for runni
 In order to use an arrow trace collector, you can use  (1) the prebuilt image available via the Github Container Registry (GHCR) or you may (2) build your own custom image.
 
 ### 1. Use the prebuilt Docker image
-1. We have built a Docker image using the example [build config](https://github.com/lightstep/otel-collector-charts/blob/main/arrow/otelcolarrow-build.yaml)
+1. We have built a Docker image using the recommended [build config](https://github.com/lightstep/otel-collector-charts/blob/main/arrow/otelcolarrow-build.yaml)
 2. This Docker [image](https://github.com/lightstep/otel-collector-charts/pkgs/container/otel-collector-charts%2Fotelarrowcol-experimental) can be pulled by running: `docker pull ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest`
-3. You can use the example collector config (`/arrow/config/saas-config.yaml`) by running:
-`docker run -it -v ./config/:/config --entrypoint /otelarrowcol ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest --config=/config/saas-collector.yaml`
+3. You can use the collector config (`/arrow/config/gateway-config.yaml`) by running:
+`docker run -it -v $(PWD)/config/:/config --entrypoint /otelarrowcol ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest --config=/config/gateway-collector.yaml`
 
 
 ### 2. Build your own custom image
@@ -33,5 +33,9 @@ In order to use an arrow trace collector, you can use  (1) the prebuilt image av
 Some of the features available in these charts are optional because
 they rely on components that have not been released in the
 OpenTelemetry Contrib Collector.  Specifically, to make use of the new
-OTel-Arrow protocol requires building a customer collector at this
-time.  See a [recommended custom collector build configuration](./gateway-build.yaml).
+OpenTelemetry Protocol With Apache Arrow support requires using either
+the prebuilt image or a customer collector build at this time.
+
+See the [recommended custom collector build
+configuration](./arrow/otelcolarrow-build.yaml.yaml) as a starting
+point.

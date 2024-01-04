@@ -5,7 +5,7 @@ build-arm64:
 	docker build . -t otelarrowcol-arm64 --platform linux/arm64
 
 run-amd64:
-	docker run -it -v ./config/:/config --entrypoint /otelarrowcol otelarrowcol-amd64 --config=/config/saas-collector.yaml
+	docker run -it -v `pwd`/config/:/config --entrypoint /otelarrowcol otelarrowcol-amd64 --config=/config/gateway-collector.yaml
 
 run-arm64:
-	docker run -it -v ./config/:/config --entrypoint /otelarrowcol otelarrowcol-arm64 --config=/config/saas-collector.yaml
+	docker run -it -v `pwd`/config/:/config --entrypoint /otelarrowcol otelarrowcol-arm64 --config=/config/gateway-collector.yaml

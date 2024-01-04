@@ -1,0 +1,127 @@
+# This is a simple but functional recommended gateway configuration.
+#
+# Depending on the number of senders and size of data, the amount of
+# resources required will vary.
+#
+# These configurations have been tested in a small configuration:
+#
+#   resources:
+#     requests:
+#       cpu: 2
+#       memory: 3Gi
+#     limits:
+#       cpu: 2
+#       memory: 8Gi
+#
+# and a large configuration
+#
+#   resources:
+#     requests:
+#       cpu: 8
+#       memory: 6Gi
+#     limits:
+#       cpu: 8
+#       memory: 24Gi
+#
+# In the larger configuration tested, we used `max_in_flight_size_mib: 128`.
+
+receivers:
+  # otelarrow is the OpenTelemetry Protocol with Apache Arrow receiver
+  # which combines support for standard OTLP/gRPC.
+  otelarrow:
+    protocols:
+      grpc:
+        # This is the default OTLP/gRPC port.  OTel-Arrow is served on the
+        # same port.
+        endpoint: "0.0.0.0:4317"
+
+        # allow large arriving telemetry payloads. they will be split
+        # into a reasonable size by the batch processor.
+        max_recv_msg_size_mib: 128
+
+        # Limit received OTel-Arrow stream length to 3m in total.
+        keepalive:
+          server_parameters:
+            max_connection_age: 30s
+            max_connection_age_grace: 2m30s
+
+  # otlp is the core OTLP exporter, which we enable to receive
+  # OTLP/HTTP data.
+  otlp:
+    protocols:
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  # The concurrent batch processor is recommended instead of the
+  # core `batchprocessor` component, when available.
+  concurrentbatch:
+    send_batch_max_size: 1500
+    send_batch_size: 1000
+    timeout: 1s
+
+    # For larger configurations, consider raising this parameter.
+    max_in_flight_size_mib: 128
+    
+exporters:
+  otelarrow:
+    endpoint: "ingest.lightstep.com:443"
+    headers:
+      "lightstep-access-token": "${LS_TOKEN}"
+
+    arrow:
+      disabled: false
+      max_stream_lifetime: 2m
+      num_streams: 6
+
+    # The pipeline will continue trying requests until they timeout.
+    # Timeout and retry settings are independent.  If retry_on_failure
+    # is also enabled, each (retried) request will also have this
+    # timeout.
+    timeout: 30s
+
+    # Retries are disabled by default.  Since the most likely reason
+    # for failure is timeout, having retry-on-failure enabled implies
+    # dedicating a significant amount of additional memory to the task.
+    retry_on_failure:
+      enabled: false
+
+    # Do not enable the sending queue.  The concurrent batch processor
+    # is a better way to parallelize the export.
+    sending_queue:
+      enabled: false
+
+service:
+  pipelines:
+    traces:
+      receivers: [otelarrow, otlp]
+      processors: [concurrentbatch]
+      exporters: [otelarrow]
+
+    metrics:
+      receivers: [otelarrow, otlp]
+      processors: [concurrentbatch]
+      exporters: [otelarrow]
+      
+  telemetry:
+    metrics:
+      level: detailed
+      readers:
+        - periodic:
+            exporter:
+              otlp:
+                protocol: grpc/protobuf
+                endpoint: https://ingest.lightstep.com:443
+                headers:
+                  lightstep-access-token: "${LS_TOKEN}"
+    traces:
+      processors:
+        - batch:
+            exporter:
+              otlp:
+                protocol: grpc/protobuf
+                endpoint: https://ingest.lightstep.com:443
+                headers:
+                  lightstep-access-token: "${LS_TOKEN}"
+    resource:
+      service.name: otelarrow-gateway-collector
