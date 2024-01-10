@@ -37,5 +37,5 @@ OpenTelemetry Protocol With Apache Arrow support requires using either
 the prebuilt image or a customer collector build at this time.
 
 See the [recommended custom collector build
-configuration](./arrow/otelcolarrow-build.yaml.yaml) as a starting
+configuration](./arrow/otelcolarrow-build.yaml) as a starting
 point.
