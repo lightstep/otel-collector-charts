@@ -1,9 +1,9 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpAMPBridge
 metadata:
-  name: {{ $.Values.clusterName }}-bridge
+  name: "{{ $.Values.clusterName }}-bridge"
 spec:
-  image: "docker.io/jaronoff/opentelemetry-operator:br-v1"
+  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge:main"
   endpoint: wss://opamp.jaronoff.com/v1/opamp
   capabilities:
     AcceptsOpAMPConnectionSettings: true
@@ -23,12 +23,12 @@ kind: ClusterRole
 metadata:
   name: opamp-bridge
 rules:
-- apiGroups:
-  - opentelemetry.io
-  resources:
-  - opentelemetrycollectors
-  verbs:
-  - '*'
+  - apiGroups:
+      - opentelemetry.io
+    resources:
+      - opentelemetrycollectors
+    verbs:
+      - "*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -39,7 +39,7 @@ roleRef:
   kind: ClusterRole
   name: "opamp-bridge"
 subjects:
-- kind: ServiceAccount
-  # quirk of the Operator
-  name: "{{ $.Values.clusterName }}-bridge-opamp-bridge"
-  namespace: {{ $.Release.Namespace }}
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: "{{ $.Values.clusterName }}-bridge-opamp-bridge"
+    namespace: "{{ $.Release.Namespace }}"
