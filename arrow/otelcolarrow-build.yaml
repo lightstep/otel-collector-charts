@@ -123,7 +123,7 @@ processors:
   # ServiceNow does not at this time recommend the probabilistic sampler processor,
   # because it leads to undercounting of spans.  We will update this recommendation
   # when the sampler is fully supported.
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.94.0
 
   # You may be interested in other transform components in the
   # Collector-Contrib repository.  Here are some that might be useful:
