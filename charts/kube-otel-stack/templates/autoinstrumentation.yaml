@@ -6,28 +6,32 @@ metadata:
 spec:
   exporter:
     endpoint: http://{{ $.Release.Name }}-{{ .Values.autoinstrumentation.collectorTarget }}-collector.{{ $.Release.Namespace }}:4317
-  propagators: {{ toYaml .Values.autoinstrumentation.propagators | nindent 4 }}
+  propagators:
+{{ toYaml .Values.autoinstrumentation.propagators | indent 4 }}
   {{- with .Values.autoinstrumentation.sampler }}
-  sampler: {{ toYaml . | nindent 4 }}
+  sampler:
+{{ toYaml . | indent 4 }}
   {{- end }}
   {{- with .Values.autoinstrumentation.env }}
-  env: {{ toYaml . | nindent 4 }}
+  env:
+{{ toYaml . | indent 4 }}
   {{- end }}
   {{- with .Values.autoinstrumentation.resource }}
-  resource: {{ toYaml . | nindent 4 }}
+  resource:
+{{ toYaml . | indent 4 }}
   {{- end }}
   {{- range $language, $settings := .Values.autoinstrumentation.languagesettings }}
-    {{- with $settings }}
   {{$language}}:
-    {{- with .env }}
-    env: {{ toYaml . | nindent 6 }}
+    {{- with $settings.env }}
+    env:
+{{ toYaml . | indent 6 }}
     {{- end }}
-    {{- if .image }}
-    image: {{ .image | quote }}
+    {{- if $settings.image }}
+    image: {{ $settings.image | quote }}
     {{- end }}
-    {{- with .resources }}
-    resources: {{ toYaml . | nindent 6 }}
-    {{- end }}
+    {{- with $settings.resources }}
+    resources:
+{{ toYaml . | indent 6 }}
     {{- end }}
   {{- end }}
 {{- end }}

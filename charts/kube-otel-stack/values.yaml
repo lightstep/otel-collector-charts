@@ -37,9 +37,9 @@ autoinstrumentation:
     # python:
     #   env:
     #     - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
-    #       value: 'true'
+    #       value: "true"
     #     - name: OTEL_TRACES_EXPORTER
-    #       value: otlp
+    #       value: "otlp"
     #   image: "<custom-image>"
     #   resources: {}
   ## A list of corev1.EnvVars
