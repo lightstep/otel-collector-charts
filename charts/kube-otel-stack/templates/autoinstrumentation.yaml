@@ -21,7 +21,7 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- range $language, $settings := .Values.autoinstrumentation.languageSettings }}
-  {{$language}}:
+  {{ $language }}:
     {{- with $settings.env }}
     env:
       {{- toYaml . | nindent 6 }}
