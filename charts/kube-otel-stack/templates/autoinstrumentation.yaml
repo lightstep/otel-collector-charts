@@ -1,4 +1,4 @@
-{{ if .Values.autoinstrumentation.enabled }}
+{{- if .Values.autoinstrumentation.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
@@ -7,17 +7,31 @@ spec:
   exporter:
     endpoint: http://{{ $.Release.Name }}-{{ .Values.autoinstrumentation.collectorTarget }}-collector.{{ $.Release.Namespace }}:4317
   propagators:
-{{ toYaml .Values.autoinstrumentation.propagators | indent 4 }}
-  {{ with .Values.autoinstrumentation.sampler }}
+    {{- toYaml .Values.autoinstrumentation.propagators | nindent 4 }}
+  {{- with .Values.autoinstrumentation.sampler }}
   sampler:
-{{ toYaml . | indent 4 }}
-  {{ end }}
-  {{ with .Values.autoinstrumentation.env }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.autoinstrumentation.env }}
   env:
-{{ toYaml . | indent 4 }}
-  {{ end }}
-  {{ with .Values.autoinstrumentation.resource }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.autoinstrumentation.resource }}
   resource:
-{{ toYaml . | indent 4 }}
-  {{ end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- range $language, $settings := .Values.autoinstrumentation.languageSettings }}
+  {{ $language }}:
+    {{- with $settings.env }}
+    env:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if $settings.image }}
+    image: {{ $settings.image | quote }}
+    {{- end }}
+    {{- with $settings.resources }}
+    resources:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
 {{- end }}
