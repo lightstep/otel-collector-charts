@@ -105,16 +105,16 @@ spec:
             scrape_interval: 5s
             static_configs:
             - labels:
-                collector_name: ${KUBE_POD_NAME}
+                collector_name: ${OTEL_K8S_POD_NAME}
               targets:
-                - 0.0.0.0:8888
+                - ${OTEL_K8S_POD_IP}:8888
           {{ end }}
         {{- if $collector.targetallocator }}
         {{- if $collector.targetallocator.enabled }}
         target_allocator:
           endpoint: http://{{ $collectorName }}-targetallocator:80
           interval: 30s
-          collector_id: ${POD_NAME}
+          collector_id: ${OTEL_K8S_POD_NAME}
           http_sd_config:
             refresh_interval: 60s
         {{ end }}
