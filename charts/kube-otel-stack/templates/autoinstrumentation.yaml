@@ -20,7 +20,7 @@ spec:
   resource:
 {{ toYaml . | indent 4 }}
   {{- end }}
-  {{- range $language, $settings := .Values.autoinstrumentation.languagesettings }}
+  {{- range $language, $settings := .Values.autoinstrumentation.languageSettings }}
   {{$language}}:
     {{- with $settings.env }}
     env:

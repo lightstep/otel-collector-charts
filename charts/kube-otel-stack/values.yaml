@@ -32,8 +32,8 @@ autoinstrumentation:
     ## The value depends on the sampler type.
     ## For instance for parentbased_traceidratio sampler type it is a number in range [0..1] e.g. 0.25.
     argument: "0.25"
-  languagesettings: {}
-  # Languagesettings defines the language specific settings for auto-instrumentation. Example:
+  languageSettings: {}
+  # LanguageSettings defines the language specific settings for auto-instrumentation. Example:
     # python:
     #   env:
     #     - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
