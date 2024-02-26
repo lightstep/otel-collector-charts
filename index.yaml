@@ -23,6 +23,26 @@ entries:
     version: 0.1.0
   kube-otel-stack:
   - apiVersion: v2
+    appVersion: 0.91.0
+    created: "2024-02-26T22:20:15.186689178Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: 954b03fdc7a3714c0511d60bc0ccd80dc6213024b0724fe38529f9f1d027735b
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.4.1/kube-otel-stack-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
     appVersion: 0.83.0
     created: "2023-11-29T18:15:24.285881898Z"
     dependencies:
@@ -504,6 +524,16 @@ entries:
     version: 0.1.1
   otel-cloud-stack:
   - apiVersion: v2
+    appVersion: 1.18.0
+    created: "2024-02-26T22:20:15.334571308Z"
+    description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
+    digest: b00b92f934d48f38ec7401d33961b7a36b83019bc53bb703220eb39f07008145
+    name: otel-cloud-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otel-cloud-stack-0.3.0/otel-cloud-stack-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 1.17.0
     created: "2023-11-29T18:15:24.546376264Z"
     description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
@@ -615,6 +645,18 @@ entries:
     version: 0.1.1
   otelcollector:
   - apiVersion: v2
+    appVersion: 0.91.0
+    created: "2024-02-26T22:20:15.475098261Z"
+    deprecated: true
+    description: Deprecated chart for using the OpenTelemetry Collector to scape static
+      or dynamic metric targets.
+    digest: 4d82278ad33cf19cecbd1525378b8bb24f00760a6c37bf8fa412b33dc9bc3471
+    name: otelcollector
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otelcollector-0.3.0/otelcollector-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 0.83.0
     created: "2023-10-05T17:05:03.820444408Z"
     deprecated: true
@@ -659,4 +701,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2023-11-29T18:15:24.546640468Z"
+generated: "2024-02-26T22:20:15.475344371Z"
