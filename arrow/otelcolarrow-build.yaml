@@ -93,10 +93,10 @@ receivers:
   # You may wish to enable other receivers from the Collector-Contrib repository or
   # elsewhere.  Here are some that might be useful:
   #
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.94.1
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.94.1
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.94.1
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.94.1
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.94.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.94.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.94.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.94.0
 
 processors:
   # We recommend use of the OTel-Arrow concurrent batch processor.
@@ -115,27 +115,27 @@ processors:
   # - go.opentelemetry.io/collector/processor/batchprocessor.
 
   # These Collector-Contrib components are referred to in the charts in this package.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.94.1
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.94.1
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.94.1
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor v0.94.1
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor v0.94.0
 
   # ServiceNow does not at this time recommend the probabilistic sampler processor,
   # because it leads to undercounting of spans.  We will update this recommendation
   # when the sampler is fully supported.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.94.1
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.94.1
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.94.0
 
   # You may be interested in other transform components in the
   # Collector-Contrib repository.  Here are some that might be useful:
   #
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.94.1
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.94.0
 
 extensions:
   # You may be interested in externsions from the Collector-Contrib repository.  None are
   # required.  Here are some that might be useful:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.94.1
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.94.1
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.94.0
 
   # We do not support use of headersetterextension to apply the lightstep-access-token
   # header on a per-request basis.  Contact ServiceNow if you are interested in
