@@ -37,7 +37,7 @@ dist:
   #   description: My Organization telemetry collector
   #
   name: otelarrowcol
-  version: 0.17.0
+  version: 0.17.1
   description: ServiceNow Cloud Observability OpenTelemetry Protocol with Apache Arrow gateway collector
 
   # This indicates which version of the core collector components as
@@ -124,6 +124,7 @@ processors:
   # because it leads to undercounting of spans.  We will update this recommendation
   # when the sampler is fully supported.
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.94.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.94.0
 
   # You may be interested in other transform components in the
   # Collector-Contrib repository.  Here are some that might be useful:
