@@ -327,7 +327,8 @@ clusterCollector:
       k8s_cluster:
         auth_type: serviceAccount
         collection_interval: 10s
-        node_conditions_to_report: [Ready, MemoryPressure, DiskPressure, NetworkUnavailable]
+        node_conditions_to_report:
+          [Ready, MemoryPressure, DiskPressure, NetworkUnavailable]
         allocatable_types_to_report: [cpu, memory, storage]
       k8s_events:
         auth_type: serviceAccount
@@ -449,6 +450,8 @@ tracesCollector:
         protocols:
           grpc:
             endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
     processors:
       resourcedetection/env:
         detectors: [env]
