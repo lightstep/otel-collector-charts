@@ -751,9 +751,9 @@ opampBridge:
   image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge:main"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"
   headers:
-    "Authorization": "<lightstep api key>"
+    "Authorization": "bearer ${LIGHTSTEP_OPAMP_API_KEY}"
   env:
-    - name: LIGHTSTEP_API_KEY
+    - name: LIGHTSTEP_OPAMP_API_KEY
       value: "[INSERT THIS VALUE]"
   capabilities:
     AcceptsOpAMPConnectionSettings: true
