@@ -1,0 +1,61 @@
+{{ $bridge := $.Values.opampBridge}}
+{{ if $bridge.enabled }}
+{{ $bridgeName := (print $.Release.Name "-bridge") }}
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpAMPBridge
+metadata:
+  name: {{ $bridgeName }}
+  {{- if $bridge.annotations }}
+  annotations:
+    {{- $bridge.annotations | toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ $bridgeName }}
+    {{- include "otel-cloud-stack.labels" $ | indent 4 }}
+spec:
+  image: {{ $bridge.image }}
+  endpoint: {{ $bridge.endpoint }}
+  capabilities:
+    {{- $bridge.capabilities | toYaml . | nindent 4 }}
+  {{- if $bridge.headers }}
+  headers:
+    {{- $bridge.headers | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if or $bridge.env $.Values.extraEnvs }}
+  env:
+    {{- toYaml (concat $.Values.extraEnvs $bridge.env) | nindent 4 }}
+    {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "opamp-bridge"
+rules:
+  - apiGroups:
+      - opentelemetry.io
+    resources:
+      - opentelemetrycollectors
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - 'list'
+      - 'get'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "{{ $bridgeName }}-opamp-bridge"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "opamp-bridge"
+subjects:
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: "{{ $bridgeName }}-opamp-bridge"
+    namespace: "{{ $.Release.Namespace }}"
+{{ end }}

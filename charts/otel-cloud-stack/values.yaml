@@ -39,6 +39,8 @@ autoinstrumentation:
 
 daemonCollector:
   name: daemon
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: true
@@ -52,10 +54,10 @@ daemonCollector:
           name: otel-collector-secret
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 250Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
   scrape_configs_file: "daemon_scrape_configs.yaml"
   config:
@@ -303,6 +305,8 @@ daemonCollector:
 # This is a singleton collector for cluster-level data
 clusterCollector:
   name: cluster-stats
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   replicas: 1
@@ -422,7 +426,8 @@ clusterCollector:
 
 ## Default collector for tracing
 tracesCollector:
-  enabled: false
+  labels:
+    opentelemetry.io/opamp-managed: "true"
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -538,7 +543,8 @@ tracesCollector:
           exporters: [otlp]
 
 logsCollector:
-  enabled: false
+  labels:
+    opentelemetry.io/opamp-reporting: "true"
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -737,3 +743,25 @@ logsCollector:
           exporters: [otlp]
 
 collectors: []
+
+opampBridge:
+  enabled: false
+  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge:main"
+  endpoint: "wss://opamp.lightstep.com/v1/opamp"
+  headers:
+    "Authorization": "<lightstep api key>"
+  env:
+    - name: LIGHTSTEP_API_KEY
+      value: "[INSERT THIS VALUE]"
+  capabilities:
+    AcceptsOpAMPConnectionSettings: true
+    AcceptsOtherConnectionSettings: true
+    AcceptsRemoteConfig: true
+    AcceptsRestartCommand: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsOwnLogs: true
+    ReportsOwnMetrics: true
+    ReportsOwnTraces: true
+    ReportsRemoteConfig: true
+    ReportsStatus: true
