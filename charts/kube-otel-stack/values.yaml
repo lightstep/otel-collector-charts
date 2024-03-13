@@ -1242,3 +1242,25 @@ prometheus-node-exporter:
     ## If true, create PSPs for node-exporter
     ##
     pspEnabled: false
+
+opampBridge:
+  enabled: false
+  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge:main"
+  endpoint: "wss://opamp.lightstep.com/v1/opamp"
+  headers:
+    "Authorization": "<lightstep api key>"
+  env:
+    - name: LIGHTSTEP_API_KEY
+      value: "[INSERT THIS VALUE]"
+  capabilities:
+    AcceptsOpAMPConnectionSettings: true
+    AcceptsOtherConnectionSettings: true
+    AcceptsRemoteConfig: true
+    AcceptsRestartCommand: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsOwnLogs: true
+    ReportsOwnMetrics: true
+    ReportsOwnTraces: true
+    ReportsRemoteConfig: true
+    ReportsStatus: true
