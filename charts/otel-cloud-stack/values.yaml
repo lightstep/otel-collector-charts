@@ -54,10 +54,10 @@ daemonCollector:
           name: otel-collector-secret
   resources:
     limits:
-      cpu: 50m
+      cpu: 100m
       memory: 250Mi
     requests:
-      cpu: 50m
+      cpu: 100m
       memory: 128Mi
   scrape_configs_file: "daemon_scrape_configs.yaml"
   config:
@@ -426,6 +426,7 @@ clusterCollector:
 
 ## Default collector for tracing
 tracesCollector:
+  enabled: false
   labels:
     opentelemetry.io/opamp-managed: "true"
   name: traces
@@ -543,6 +544,7 @@ tracesCollector:
           exporters: [otlp]
 
 logsCollector:
+  enabled: false
   labels:
     opentelemetry.io/opamp-reporting: "true"
   name: logs
