@@ -5,9 +5,9 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpAMPBridge
 metadata:
   name: {{ $bridgeName }}
-  {{- if $bridge.annotations }}
+  {{- with $bridge.annotations }}
   annotations:
-    {{- $bridge.annotations | toYaml . | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     app: {{ $bridgeName }}
@@ -15,11 +15,13 @@ metadata:
 spec:
   image: {{ $bridge.image }}
   endpoint: {{ $bridge.endpoint }}
+  {{- with $bridge.capabilities }}
   capabilities:
-    {{- $bridge.capabilities | toYaml . | nindent 4 }}
-  {{- if $bridge.headers }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $bridge.headers }}
   headers:
-    {{- $bridge.headers | toYaml | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- if or $bridge.env $.Values.extraEnvs }}
   env:

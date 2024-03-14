@@ -12,6 +12,7 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
+    {{- $collector.labels | toYaml | nindent 4 }}
     {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
   {{- if $collector.nodeSelector }}
