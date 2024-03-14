@@ -12,7 +12,9 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
-    {{- $collector.labels | toYaml | nindent 4 }}
+    {{- with $collector.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}
