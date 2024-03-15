@@ -354,7 +354,7 @@ logsCollector:
   enabled: false
   mode: daemonset
   labels:
-    opentelemetry.io/opamp-reporting: "true"
+    opentelemetry.io/opamp-managed: "true"
   resources:
     limits:
       cpu: 250m

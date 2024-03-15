@@ -546,7 +546,7 @@ tracesCollector:
 logsCollector:
   enabled: false
   labels:
-    opentelemetry.io/opamp-reporting: "true"
+    opentelemetry.io/opamp-managed: "true"
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
