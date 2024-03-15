@@ -55,13 +55,12 @@ collectors: []
 ## Default collector for tracing
 tracesCollector:
   enabled: false
+  opampManaged: false
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   mode: deployment
   replicas: 1
-  labels:
-    opentelemetry.io/opamp-managed: "true"
   hpa:
     enabled: false
     minReplicas: 3
@@ -222,10 +221,9 @@ metricsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: true
+  opampManaged: false
   mode: statefulset
   replicas: 3
-  labels:
-    opentelemetry.io/opamp-managed: "true"
   hpa:
     enabled: false
     minReplicas: 3
@@ -352,9 +350,8 @@ logsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: false
+  opampManaged: false
   mode: daemonset
-  labels:
-    opentelemetry.io/opamp-managed: "true"
   resources:
     limits:
       cpu: 250m

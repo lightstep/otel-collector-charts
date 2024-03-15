@@ -12,8 +12,8 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
-    {{- with $collector.labels }}
-      {{- toYaml . | nindent 4 }}
+    {{- if $collector.opampManaged }}
+    opentelemetry.io/opamp-managed: "true"
     {{- end }}
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
