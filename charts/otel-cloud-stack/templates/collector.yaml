@@ -15,6 +15,9 @@ metadata:
     {{- if $collector.opampManaged }}
     opentelemetry.io/opamp-managed: "true"
     {{- end }}
+    {{- if $collector.opampReporting }}
+    opentelemetry.io/opamp-reporting: "true"
+    {{- end }}
     {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
   {{- if $collector.nodeSelector }}

@@ -55,7 +55,8 @@ collectors: []
 ## Default collector for tracing
 tracesCollector:
   enabled: false
-  opampManaged: true
+  opampManaged: false
+  opampReporting: true
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -221,7 +222,8 @@ metricsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: true
-  opampManaged: true
+  opampManaged: false
+  opampReporting: true
   mode: statefulset
   replicas: 3
   hpa:
@@ -350,7 +352,8 @@ logsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: false
-  opampManaged: true
+  opampManaged: false
+  opampReporting: true
   mode: daemonset
   resources:
     limits:
