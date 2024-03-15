@@ -33,7 +33,7 @@ autoinstrumentation:
     ## For instance for parentbased_traceidratio sampler type it is a number in range [0..1] e.g. 0.25.
     argument: "0.25"
   languageSettings: {}
-  # LanguageSettings defines the language specific settings for auto-instrumentation. Example:
+    # LanguageSettings defines the language specific settings for auto-instrumentation. Example:
     # python:
     #   env:
     #     - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
@@ -41,7 +41,7 @@ autoinstrumentation:
     #     - name: OTEL_TRACES_EXPORTER
     #       value: "otlp"
     #   image: "<custom-image>"
-    #   resources: {}
+  #   resources: {}
   ## A list of corev1.EnvVars
   env: []
 
@@ -55,10 +55,9 @@ collectors: []
 ## Default collector for tracing
 tracesCollector:
   enabled: false
-  opampManaged: false
-  opampReporting: true
   name: traces
   clusterName: ""
+
   image: otel/opentelemetry-collector-contrib:0.88.0
   mode: deployment
   replicas: 1
@@ -222,8 +221,6 @@ metricsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: true
-  opampManaged: false
-  opampReporting: true
   mode: statefulset
   replicas: 3
   hpa:
@@ -352,8 +349,6 @@ logsCollector:
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: false
-  opampManaged: false
-  opampReporting: true
   mode: daemonset
   resources:
     limits:
@@ -1247,28 +1242,3 @@ prometheus-node-exporter:
     ## If true, create PSPs for node-exporter
     ##
     pspEnabled: false
-
-opAMPBridge:
-  enabled: false
-  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge::0.96.0"
-  endpoint: "wss://opamp.lightstep.com/v1/opamp"
-  headers:
-    "Authorization": "bearer ${LS_OPAMP_API_KEY}"
-  env:
-    - name: LS_OPAMP_API_KEY
-      valueFrom:
-        secretKeyRef:
-          key: LS_OPAMP_API_KEY
-          name: otel-opamp-bridge-secret
-  capabilities:
-    AcceptsOpAMPConnectionSettings: true
-    AcceptsOtherConnectionSettings: true
-    AcceptsRemoteConfig: true
-    AcceptsRestartCommand: true
-    ReportsEffectiveConfig: true
-    ReportsHealth: true
-    ReportsOwnLogs: true
-    ReportsOwnMetrics: true
-    ReportsOwnTraces: true
-    ReportsRemoteConfig: true
-    ReportsStatus: true

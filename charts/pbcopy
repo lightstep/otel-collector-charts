@@ -1,0 +1,1422 @@
+---
+# Source: otel-cloud-stack/templates/bridge.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: test-stack-bridge
+rules:
+  - apiGroups:
+      - opentelemetry.io
+    resources:
+      - opentelemetrycollectors
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - 'list'
+      - 'get'
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "test-stack-daemon"
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "test-stack-cluster-stats"
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "test-stack-traces"
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "test-stack-logs"
+rules:
+- apiGroups: [""]
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/stats
+  - nodes/spec
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - resourcequotas
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - endpoints
+  - persistentvolumes
+  - persistentvolumeclaims
+  - pods
+  - pods/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources:
+  - servicemonitors
+  - podmonitors
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+  verbs: ["get"]
+---
+# Source: otel-cloud-stack/templates/bridge.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: test-stack-otel-cloud-stack
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "test-stack-bridge"
+subjects:
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: "test-stack-otel-cloud-stack-bridge-opamp-bridge"
+    namespace: "default"
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "test-stack-daemon"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "test-stack-daemon"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "test-stack-daemon-collector"
+  namespace: default
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "test-stack-cluster-stats"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "test-stack-cluster-stats"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "test-stack-cluster-stats-collector"
+  namespace: default
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "test-stack-traces"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "test-stack-traces"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "test-stack-traces-collector"
+  namespace: default
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: "test-stack-logs"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "test-stack-logs"
+subjects:
+- kind: ServiceAccount
+  # quirk of the Operator
+  name: "test-stack-logs-collector"
+  namespace: default
+---
+# Source: otel-cloud-stack/templates/bridge.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpAMPBridge
+metadata:
+  name: test-stack-otel-cloud-stack
+  labels:    
+    environment: default
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test-stack
+    app.kubernetes.io/version: "0.4.0"
+    app.kubernetes.io/part-of: otel-cloud-stack
+    chart: otel-cloud-stack-0.4.0
+    release: "test-stack"
+    heritage: "Helm"
+spec:
+  endpoint: wss://opamp.lightstep.com/v1/opamp
+  headers:
+    Authorization: bearer ${LS_OPAMP_API_KEY}
+  capabilities:
+    AcceptsOpAMPConnectionSettings: true
+    AcceptsOtherConnectionSettings: true
+    AcceptsRemoteConfig: true
+    AcceptsRestartCommand: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsOwnLogs: true
+    ReportsOwnMetrics: true
+    ReportsOwnTraces: true
+    ReportsRemoteConfig: true
+    ReportsStatus: true
+  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge:0.96.0"
+  env:
+    - name: OTEL_K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: OTEL_K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name=jason-test"
+    - name: LS_OPAMP_API_KEY
+      valueFrom:
+        secretKeyRef:
+          key: LS_OPAMP_API_KEY
+          name: otel-opamp-bridge-secret
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "test-stack-daemon"
+  labels:
+    app: test-stack-daemon
+    opentelemetry.io/opamp-reporting: "true"    
+    environment: default
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test-stack
+    app.kubernetes.io/version: "0.4.0"
+    app.kubernetes.io/part-of: otel-cloud-stack
+    chart: otel-cloud-stack-0.4.0
+    release: "test-stack"
+    heritage: "Helm"
+spec:
+  mode: daemonset
+  image: otel/opentelemetry-collector-contrib:0.88.0
+  volumeMounts:
+    # This is assuming the hostmetrics receiver/something is on.
+    - name: hostfs
+      mountPath: /hostfs
+      readOnly: true
+      mountPropagation: HostToContainer
+  volumes:
+    - name: hostfs
+      hostPath:
+        path: /
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name=jason-test,k8s.node.name=$(K8S_NODE_NAME)"
+  config: |
+    exporters:
+      logging:
+        sampling_initial: 5
+        sampling_thereafter: 200
+        verbosity: detailed
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          lightstep-access-token: ${LS_TOKEN}
+        retry_on_failure:
+          enabled: true
+          max_elapsed_time: 60s
+        sending_queue:
+          enabled: true
+          num_consumers: 4
+          queue_size: 100
+        timeout: 30s
+    receivers:
+      prometheus/file:
+        config:
+          scrape_configs:
+          
+          # Collect node metrics
+          - job_name: kubernetes-pods
+            scrape_interval: 30s
+            kubernetes_sd_configs:
+            - role: pod
+              selectors:
+              - role: pod
+                # only scrape data from pods running on the same node as collector
+                field: "spec.nodeName=$K8S_NODE_NAME"
+            relabel_configs:
+              - source_labels: [ __meta_kubernetes_pod_annotation_prometheus_io_scrape ]
+                action: keep
+                regex: true
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]
+                action: drop
+                regex: true
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+                action: replace
+                regex: (https?)
+                target_label: __scheme__
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+                action: replace
+                target_label: __metrics_path__
+                regex: (.+)
+              - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+                action: replace
+                regex: ([^:]+)(?::\d+)?;(\d+)
+                # NOTE: otel collector uses env var replacement. $$ is used as a literal $.
+                replacement: $$1:$$2
+                target_label: __address__
+              - action: labelmap
+                regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+                replacement: __param_$$1
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [__meta_kubernetes_namespace]
+                action: replace
+                target_label: namespace
+              - source_labels: [__meta_kubernetes_pod_name]
+                action: replace
+                target_label: pod
+              - source_labels: [__meta_kubernetes_pod_phase]
+                regex: Pending|Succeeded|Failed|Completed
+                action: drop
+              - action: replace
+                source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                target_label: job
+          - job_name: node-exporter
+            scrape_interval: 30s
+            relabel_configs:
+            - action: labelmap
+              regex: __meta_kubernetes_node_label_(.+)
+            - action: replace
+              regex: "(.*)"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - job
+              target_label: __tmp_prometheus_job_name
+            static_configs:
+              - targets:
+                - ${K8S_NODE_NAME}:9100
+          # We still need to scrape kubelet's CAdvisor which isn't supported
+          - authorization:
+              credentials_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+              type: Bearer
+            follow_redirects: true
+            honor_labels: true
+            honor_timestamps: true
+            job_name: kubelet
+            kubernetes_sd_configs:
+            - follow_redirects: true
+              role: node
+              # selectors:
+              # - role: node
+              #   # only scrape data from pods running on the same node as collector
+              #   field: "metadata.name=$K8S_NODE_NAME"
+            metric_relabel_configs:
+            - action: drop
+              regex: container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __name__
+            - action: drop
+              regex: container_fs_(io_current|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __name__
+            - action: drop
+              regex: container_memory_(mapped_file|swap)
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __name__
+            - action: drop
+              regex: container_(file_descriptors|tasks_state|threads_max)
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __name__
+            - action: drop
+              regex: container_spec.*
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __name__
+            - action: drop
+              regex: ".+;"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - id
+              - pod
+            metrics_path: "/metrics/cadvisor"
+            relabel_configs:
+            - action: replace
+              regex: "(.*)"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - job
+              target_label: __tmp_prometheus_job_name
+            - action: replace
+              replacement: "kubelet"
+              target_label: job
+            - action: replace
+              regex: "(.*)"
+              replacement: "${1}"
+              separator: ";"
+              source_labels:
+              - __meta_kubernetes_node_name
+              target_label: node
+            - action: replace
+              regex: "(.*)"
+              replacement: https-metrics
+              separator: ";"
+              target_label: endpoint
+            - action: replace
+              regex: "(.*)"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __metrics_path__
+              target_label: metrics_path
+            - action: hashmod
+              modulus: 1
+              regex: "(.*)"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __address__
+              target_label: __tmp_hash
+            - action: keep
+              regex: "$(SHARD)"
+              replacement: "$1"
+              separator: ";"
+              source_labels:
+              - __tmp_hash
+            scheme: https
+            scrape_interval: 15s
+            scrape_timeout: 10s
+            tls_config:
+              ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+              insecure_skip_verify: true
+          
+      hostmetrics:
+        collection_interval: 30s
+        root_path: /hostfs
+        scrapers:
+          cpu:
+            metrics:
+              system.cpu.utilization:
+                enabled: true
+          disk: {}
+          filesystem:
+            exclude_fs_types:
+              fs_types:
+              - autofs
+              - binfmt_misc
+              - bpf
+              - cgroup2
+              - configfs
+              - debugfs
+              - devpts
+              - devtmpfs
+              - fusectl
+              - hugetlbfs
+              - iso9660
+              - mqueue
+              - nsfs
+              - overlay
+              - proc
+              - procfs
+              - pstore
+              - rpc_pipefs
+              - securityfs
+              - selinuxfs
+              - squashfs
+              - sysfs
+              - tracefs
+              match_type: strict
+            exclude_mount_points:
+              match_type: regexp
+              mount_points:
+              - /dev/.*
+              - /proc/.*
+              - /sys/.*
+              - /run/k3s/containerd/.*
+              - /var/lib/docker/.*
+              - /var/lib/kubelet/.*
+              - /snap/.*
+            metrics:
+              system.filesystem.utilization:
+                enabled: true
+          load: {}
+          memory:
+            metrics:
+              system.memory.utilization:
+                enabled: true
+          network: {}
+      kubeletstats:
+        auth_type: serviceAccount
+        collection_interval: 15s
+        endpoint: https://${env:K8S_NODE_IP}:10250
+        extra_metadata_labels:
+        - container.id
+        - k8s.volume.type
+        insecure_skip_verify: true
+        k8s_api_config:
+          auth_type: serviceAccount
+        metric_groups:
+        - node
+        - pod
+        - volume
+        - container
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      batch:
+        send_batch_max_size: 1500
+        send_batch_size: 1000
+        timeout: 1s
+      k8sattributes:
+        extract:
+          labels:
+          - from: pod
+            key: app.kubernetes.io/name
+            tag_name: service.name
+          - from: pod
+            key: k8s-app
+            tag_name: service.name
+          - from: pod
+            key: app.kubernetes.io/instance
+            tag_name: k8s.app.instance
+          - from: pod
+            key: app.kubernetes.io/version
+            tag_name: service.version
+          - from: pod
+            key: app.kubernetes.io/component
+            tag_name: k8s.app.component
+          metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.node.name
+          - k8s.pod.start_time
+          - k8s.deployment.name
+          - k8s.replicaset.name
+          - k8s.replicaset.uid
+          - k8s.daemonset.name
+          - k8s.daemonset.uid
+          - k8s.job.name
+          - k8s.job.uid
+          - k8s.container.name
+          - k8s.cronjob.name
+          - k8s.statefulset.name
+          - k8s.statefulset.uid
+          - container.image.tag
+          - container.image.name
+          - k8s.cluster.uid
+        filter:
+          node_from_env_var: K8S_NODE_NAME
+        passthrough: false
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+          - from: resource_attribute
+            name: k8s.node.name
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+        - sources:
+          - from: connection
+      resourcedetection/env:
+        detectors:
+        - env
+        override: false
+        timeout: 2s
+    service:
+      pipelines:
+        metrics:
+          exporters:
+          - otlp
+          processors:
+          - resourcedetection/env
+          - k8sattributes
+          - batch
+          receivers:
+          - prometheus/file
+          - otlp
+          - kubeletstats
+          - hostmetrics
+  resources:
+    limits:
+      cpu: 100m
+      memory: 250Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "test-stack-cluster-stats"
+  labels:
+    app: test-stack-cluster-stats
+    opentelemetry.io/opamp-reporting: "true"    
+    environment: default
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test-stack
+    app.kubernetes.io/version: "0.4.0"
+    app.kubernetes.io/part-of: otel-cloud-stack
+    chart: otel-cloud-stack-0.4.0
+    release: "test-stack"
+    heritage: "Helm"
+spec:
+  mode: deployment
+  image: otel/opentelemetry-collector-contrib:0.88.0
+  replicas: 1
+  volumeMounts:
+  volumes:
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name=jason-test"
+  config: |
+    exporters:
+      logging:
+        sampling_initial: 5
+        sampling_thereafter: 200
+        verbosity: normal
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          lightstep-access-token: ${LS_TOKEN}
+    receivers:
+      k8s_cluster:
+        allocatable_types_to_report:
+        - cpu
+        - memory
+        - storage
+        auth_type: serviceAccount
+        collection_interval: 10s
+        node_conditions_to_report:
+        - Ready
+        - MemoryPressure
+        - DiskPressure
+        - NetworkUnavailable
+      k8s_events:
+        auth_type: serviceAccount
+    processors:
+      batch:
+        send_batch_max_size: 1500
+        send_batch_size: 1000
+        timeout: 1s
+      k8sattributes:
+        extract:
+          labels:
+          - from: pod
+            key: app.kubernetes.io/name
+            tag_name: service.name
+          - from: pod
+            key: k8s-app
+            tag_name: service.name
+          - from: pod
+            key: app.kubernetes.io/instance
+            tag_name: k8s.app.instance
+          - from: pod
+            key: app.kubernetes.io/version
+            tag_name: service.version
+          - from: pod
+            key: app.kubernetes.io/component
+            tag_name: k8s.app.component
+          metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.node.name
+          - k8s.pod.start_time
+          - k8s.deployment.name
+          - k8s.replicaset.name
+          - k8s.replicaset.uid
+          - k8s.daemonset.name
+          - k8s.daemonset.uid
+          - k8s.job.name
+          - k8s.job.uid
+          - k8s.container.name
+          - k8s.cronjob.name
+          - k8s.statefulset.name
+          - k8s.statefulset.uid
+          - container.image.tag
+          - container.image.name
+          - k8s.cluster.uid
+        passthrough: false
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+          - from: resource_attribute
+            name: k8s.node.name
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+        - sources:
+          - from: connection
+      resourcedetection/env:
+        detectors:
+        - env
+        override: false
+        timeout: 2s
+    service:
+      pipelines:
+        metrics/k8s_cluster:
+          exporters:
+          - otlp
+          - logging
+          processors:
+          - resourcedetection/env
+          - k8sattributes
+          - batch
+          receivers:
+          - k8s_cluster
+  resources:
+    limits:
+      cpu: 100m
+      memory: 500Mi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "test-stack-traces"
+  labels:
+    app: test-stack-traces
+    opentelemetry.io/opamp-reporting: "true"    
+    environment: default
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test-stack
+    app.kubernetes.io/version: "0.4.0"
+    app.kubernetes.io/part-of: otel-cloud-stack
+    chart: otel-cloud-stack-0.4.0
+    release: "test-stack"
+    heritage: "Helm"
+spec:
+  mode: deployment
+  image: otel/opentelemetry-collector-contrib:0.88.0
+  replicas: 1
+  volumeMounts:
+  volumes:
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name=jason-test"
+  config: |
+    exporters:
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          lightstep-access-token: ${LS_TOKEN}
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    processors:
+      batch:
+        send_batch_max_size: 1500
+        send_batch_size: 1000
+        timeout: 1s
+      k8sattributes:
+        extract:
+          labels:
+          - from: pod
+            key: app.kubernetes.io/name
+            tag_name: service.name
+          - from: pod
+            key: k8s-app
+            tag_name: service.name
+          - from: pod
+            key: app.kubernetes.io/instance
+            tag_name: k8s.app.instance
+          - from: pod
+            key: app.kubernetes.io/version
+            tag_name: service.version
+          - from: pod
+            key: app.kubernetes.io/component
+            tag_name: k8s.app.component
+          metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.node.name
+          - k8s.pod.start_time
+          - k8s.deployment.name
+          - k8s.replicaset.name
+          - k8s.replicaset.uid
+          - k8s.daemonset.name
+          - k8s.daemonset.uid
+          - k8s.job.name
+          - k8s.job.uid
+          - k8s.container.name
+          - k8s.cronjob.name
+          - k8s.statefulset.name
+          - k8s.statefulset.uid
+          - container.image.tag
+          - container.image.name
+          - k8s.cluster.uid
+        passthrough: false
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+          - from: resource_attribute
+            name: k8s.node.name
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+        - sources:
+          - from: connection
+      resourcedetection/env:
+        detectors:
+        - env
+        override: false
+        timeout: 2s
+    service:
+      pipelines:
+        traces:
+          exporters:
+          - otlp
+          processors:
+          - resourcedetection/env
+          - k8sattributes
+          - batch
+          receivers:
+          - otlp
+  resources:
+    limits:
+      cpu: 250m
+      memory: 250Mi
+    requests:
+      cpu: 250m
+      memory: 250Mi
+---
+# Source: otel-cloud-stack/templates/collector.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: "test-stack-logs"
+  labels:
+    app: test-stack-logs
+    opentelemetry.io/opamp-reporting: "true"    
+    environment: default
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test-stack
+    app.kubernetes.io/version: "0.4.0"
+    app.kubernetes.io/part-of: otel-cloud-stack
+    chart: otel-cloud-stack-0.4.0
+    release: "test-stack"
+    heritage: "Helm"
+spec:
+  mode: daemonset
+  image: otel/opentelemetry-collector-contrib:0.88.0
+  volumeMounts:
+    - mountPath: /var/log
+      name: varlog
+      readOnly: true
+    - mountPath: /var/lib/docker/containers
+      name: varlibdockercontainers
+      readOnly: true
+  volumes:
+    - hostPath:
+        path: /var/log
+      name: varlog
+    - hostPath:
+        path: /var/lib/docker/containers
+      name: varlibdockercontainers
+    
+  env:
+    - name: LS_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: otel-collector-secret
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name=jason-test,k8s.node.name=$(K8S_NODE_NAME)"
+  config: |
+    exporters:
+      otlp:
+        endpoint: ingest.lightstep.com:443
+        headers:
+          lightstep-access-token: ${LS_TOKEN}
+    receivers:
+      filelog:
+        include:
+        - /var/log/pods/*/*/*.log
+        include_file_name: false
+        include_file_path: true
+        operators:
+        - id: get-format
+          routes:
+          - expr: body matches "^\\{"
+            output: parser-docker
+          - expr: body matches "^[^ Z]+ "
+            output: parser-crio
+          - expr: body matches "^[^ Z]+Z"
+            output: parser-containerd
+          type: router
+        - id: parser-crio
+          output: extract_metadata_from_filepath
+          regex: ^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$
+          timestamp:
+            layout: 2006-01-02T15:04:05.999999999Z07:00
+            layout_type: gotime
+            parse_from: attributes.time
+          type: regex_parser
+        - id: parser-containerd
+          output: extract_metadata_from_filepath
+          regex: ^(?P<time>[^ ^Z]+Z) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$
+          timestamp:
+            layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+            parse_from: attributes.time
+          type: regex_parser
+        - id: parser-docker
+          output: extract_metadata_from_filepath
+          timestamp:
+            layout: '%Y-%m-%dT%H:%M:%S.%LZ'
+            parse_from: attributes.time
+          type: json_parser
+        - from: attributes.log
+          to: body
+          type: move
+        - cache:
+            size: 128
+          id: extract_metadata_from_filepath
+          parse_from: attributes["log.file.path"]
+          regex: ^.*\/(?P<namespace>[^_]+)_(?P<pod_name>[^_]+)_(?P<uid>[a-f0-9\-]{36})\/(?P<container_name>[^\._]+)\/(?P<restart_count>\d+)\.log$
+          type: regex_parser
+        - from: attributes.stream
+          to: attributes["log.iostream"]
+          type: move
+        - from: attributes.container_name
+          to: resource["k8s.container.name"]
+          type: move
+        - from: attributes.namespace
+          to: resource["k8s.namespace.name"]
+          type: move
+        - from: attributes.pod_name
+          to: resource["k8s.pod.name"]
+          type: move
+        - from: attributes.restart_count
+          to: resource["k8s.container.restart_count"]
+          type: move
+        - from: attributes.uid
+          to: resource["k8s.pod.uid"]
+          type: move
+        start_at: beginning
+      k8s_events: {}
+    processors:
+      batch:
+        send_batch_max_size: 1500
+        send_batch_size: 1000
+        timeout: 1s
+      k8sattributes:
+        extract:
+          labels:
+          - from: pod
+            key: app.kubernetes.io/name
+            tag_name: service.name
+          - from: pod
+            key: k8s-app
+            tag_name: service.name
+          - from: pod
+            key: app.kubernetes.io/instance
+            tag_name: k8s.app.instance
+          - from: pod
+            key: app.kubernetes.io/version
+            tag_name: service.version
+          - from: pod
+            key: app.kubernetes.io/component
+            tag_name: k8s.app.component
+          metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.node.name
+          - k8s.pod.start_time
+          - k8s.deployment.name
+          - k8s.replicaset.name
+          - k8s.replicaset.uid
+          - k8s.daemonset.name
+          - k8s.daemonset.uid
+          - k8s.job.name
+          - k8s.job.uid
+          - k8s.container.name
+          - k8s.cronjob.name
+          - k8s.statefulset.name
+          - k8s.statefulset.uid
+          - container.image.tag
+          - container.image.name
+          - k8s.cluster.uid
+        passthrough: false
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+          - from: resource_attribute
+            name: k8s.node.name
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.name
+          - from: resource_attribute
+            name: k8s.namespace.name
+        - sources:
+          - from: connection
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 30
+      resourcedetection/env:
+        detectors:
+        - env
+        override: false
+        timeout: 2s
+    service:
+      pipelines:
+        logs:
+          exporters:
+          - otlp
+          processors:
+          - memory_limiter
+          - resourcedetection/env
+          - k8sattributes
+          - batch
+          receivers:
+          - k8s_events
+          - filelog
+  resources:
+    limits:
+      cpu: 100m
+      memory: 250Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

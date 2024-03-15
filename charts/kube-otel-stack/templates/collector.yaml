@@ -11,12 +11,6 @@ metadata:
     {{- toYaml . | nindent 4}}
   {{- end }}
   labels:
-    app: {{ $collectorName }}
-    {{- if $collector.opampReporting }}
-    opentelemetry.io/opamp-reporting: "true"
-    {{- else if $collector.opampManaged }}
-    opentelemetry.io/opamp-managed: "true"
-    {{- end }}
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}
@@ -149,47 +143,47 @@ kind: ClusterRole
 metadata:
   name: "{{ $collectorName }}"
 rules:
-- apiGroups: [""]
-  resources:
-  - namespaces
-  - nodes
-  - nodes/proxy
-  - nodes/metrics
-  - services
-  - endpoints
-  - pods
-  - events
-  - secrets
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["monitoring.coreos.com"]
-  resources:
-  - servicemonitors
-  - podmonitors
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - apps
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  - statefulsets
-  verbs: ["get", "list", "watch"]
-- apiGroups:
-  - networking.k8s.io
-  resources:
-  - ingresses
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["discovery.k8s.io"]
-  resources:
-  - endpointslices
-  verbs: ["get", "list", "watch"]
-- nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
-  verbs: ["get"]
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+      - events
+      - secrets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources:
+      - servicemonitors
+      - podmonitors
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources:
+      - endpointslices
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: ["get"]
 {{- if $collector.extraRbac }}
 {{ toYaml $collector.extraRbac }}
 {{- end }}
@@ -203,14 +197,14 @@ roleRef:
   kind: ClusterRole
   name: "{{ $collectorName }}"
 subjects:
-- kind: ServiceAccount
-  # quirk of the Operator
-  name: "{{ $collectorName }}-collector"
-  namespace: {{ $.Release.Namespace }}
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: "{{ $collectorName }}-collector"
+    namespace: {{ $.Release.Namespace }}
 {{- if eq $collector.mode "statefulset" }}
-- kind: ServiceAccount
-  name: {{ $collectorName }}-targetallocator
-  namespace: {{ $.Release.Namespace }}
+  - kind: ServiceAccount
+    name: {{ $collectorName }}-targetallocator
+    namespace: {{ $.Release.Namespace }}
 {{- end }}
 ---
 {{ end }}
