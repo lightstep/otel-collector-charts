@@ -1248,7 +1248,7 @@ prometheus-node-exporter:
     ##
     pspEnabled: false
 
-opampBridge:
+opAMPBridge:
   enabled: false
   image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge::0.96.0"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"

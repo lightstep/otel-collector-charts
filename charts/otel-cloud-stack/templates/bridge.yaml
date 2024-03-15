@@ -1,37 +1,154 @@
-{{ $bridge := $.Values.opampBridge}}
-{{ if $bridge.enabled }}
-{{ $bridgeName := (print $.Release.Name "-bridge") }}
+{{- if .Values.opAMPBridge.enabled }}
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpAMPBridge
 metadata:
-  name: {{ $bridgeName }}
-  {{- with $bridge.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  name: {{ include "opentelemetry-opamp-bridge.fullname" . }}
   labels:
-    app: {{ $bridgeName }}
     {{- include "otel-cloud-stack.labels" $ | indent 4 }}
-spec:
-  image: {{ $bridge.image }}
-  endpoint: {{ $bridge.endpoint }}
-  {{- with $bridge.capabilities }}
-  capabilities:
-    {{- toYaml . | nindent 4 }}
+    {{- with $.Values.opAMPBridge.labels }}
+    {{- range $key, $value := . }}
+    {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 4 }}
+    {{- end }}
+    {{- end }}
+  {{- with $.Values.opAMPBridge.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 4 }}
+    {{- end }}
   {{- end }}
-  {{- with $bridge.headers }}
+spec:
+  {{- if $.Values.opAMPBridge.endpoint }}
+  endpoint: {{ $.Values.opAMPBridge.endpoint }}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.headers }}
   headers:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- if or $bridge.env $.Values.extraEnvs }}
+  {{- with $.Values.opAMPBridge.capabilities }}
+  capabilities:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.componentsAllowed }}
+  componentsAllowed:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.nodeSelector }}
+  nodeSelector:
+   {{- toYaml . | nindent 4}}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.replicas }}
+  replicas: {{ $.Values.opAMPBridge.replicas }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.serviceAccount }}
+  serviceAccount: {{ $.Values.opAMPBridge.serviceAccount }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.image.digest }}
+  image: "{{ $.Values.opAMPBridge.image.repository }}@{{ $.Values.opAMPBridge.image.digest }}"
+  {{- else }}
+  image: "{{ $.Values.opAMPBridge.image.repository }}:{{ $.Values.opAMPBridge.image.tag | default $.Chart.AppVersion }}"
+  {{- end }}
+  {{- if $.Values.opAMPBridge.upgradeStrategy }}
+  upgradeStrategy: {{ $.Values.opAMPBridge.upgradeStrategy }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.imagePullPolicy }}
+  imagePullPolicy: {{ $.Values.opAMPBridge.imagePullPolicy }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.hostNetwork }}
+  hostNetwork: {{ $.Values.opAMPBridge.hostNetwork }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.priorityClassName }}
+  priorityClassName: {{ $.Values.opAMPBridge.priorityClassName }}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.securityContext }}
+  securityContext:
+   {{- toYaml . | nindent 4}}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.podAnnotations }}
+  podAnnotations:
+   {{- toYaml . | nindent 4}}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.resources }}
+  resources:
+   {{- toYaml . | nindent 4}}
+  {{- end }}
+  {{- with $.Values.opAMPBridge.affinity }}
+  affinity:
+   {{- toYaml . | nindent 4}}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.tolerations }}
+  tolerations:
+  {{- with $.Values.opAMPBridge.tolerations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.volumes }}
+  volumes:
+  {{- with $.Values.opAMPBridge.volumes }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.topologySpreadConstraints }}
+  topologySpreadConstraints:
+  {{- with $.Values.opAMPBridge.topologySpreadConstraints }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.volumeMounts }}
+  volumeMounts:
+  {{- with $.Values.opAMPBridge.volumeMounts }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.ports }}
+  ports:
+  {{- with $.Values.opAMPBridge.ports }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
   env:
-    {{- toYaml (concat $.Values.extraEnvs $bridge.env) | nindent 4 }}
-    {{- end }}
+  {{- with $.Values.extraEnvs }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+    - name: OTEL_K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: OTEL_K8S_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: OTEL_RESOURCE_ATTRIBUTES
+      value: "k8s.cluster.name={{ $.Values.clusterName }}"
+  {{- with $.Values.opAMPBridge.env }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if $.Values.opAMPBridge.envFrom }}
+  envFrom:
+  {{- with $.Values.opAMPBridge.envFrom }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: "opamp-bridge"
+  name: {{ include "opentelemetry-opamp-bridge.clusterRoleName" . }}
 rules:
   - apiGroups:
       - opentelemetry.io
@@ -50,14 +167,18 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: "{{ $bridgeName }}-opamp-bridge"
+  name: {{ include "opentelemetry-opamp-bridge.fullname" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: "opamp-bridge"
+  name: "{{ include "opentelemetry-opamp-bridge.clusterRoleName" . }}"
 subjects:
   - kind: ServiceAccount
     # quirk of the Operator
-    name: "{{ $bridgeName }}-opamp-bridge"
+    {{- if $.Values.opAMPBridge.serviceAccount }}
+    name: "{{ $.Values.opAMPBridge.serviceAccount }}"
+    {{- else }}
+    name: "{{ (include "opentelemetry-opamp-bridge.fullname" .) }}-bridge-opamp-bridge"
+    {{- end }}
     namespace: "{{ $.Release.Namespace }}"
-{{ end }}
+{{- end }}

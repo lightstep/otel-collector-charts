@@ -746,9 +746,11 @@ logsCollector:
 
 collectors: []
 
-opampBridge:
+opAMPBridge:
   enabled: false
-  image: "ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge::0.96.0"
+  image:
+    repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
+    tag: "0.96.0"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"
   headers:
     "Authorization": "bearer ${LS_OPAMP_API_KEY}"

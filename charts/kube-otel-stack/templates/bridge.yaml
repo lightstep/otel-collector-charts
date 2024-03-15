@@ -1,4 +1,4 @@
-{{ $bridge := $.Values.opampBridge}}
+{{ $bridge := $.Values.opAMPBridge}}
 {{ if $bridge.enabled }}
 {{ $bridgeName := (print $.Release.Name "-bridge") }}
 apiVersion: opentelemetry.io/v1alpha1
