@@ -38,12 +38,11 @@ autoinstrumentation:
   resource: {}
 
 daemonCollector:
+  enabled: true
   name: daemon
-  labels:
-    opentelemetry.io/opamp-managed: "true"
+  opampManaged: false
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
-  enabled: true
   mode: daemonset
   mountHostFS: true
   env:
@@ -304,14 +303,13 @@ daemonCollector:
 
 # This is a singleton collector for cluster-level data
 clusterCollector:
+  enabled: true
+  opampManaged: false
   name: cluster-stats
-  labels:
-    opentelemetry.io/opamp-managed: "true"
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   replicas: 1
   mode: deployment
-  enabled: true
   mountHostFS: false
   resources:
     limits:
@@ -427,8 +425,7 @@ clusterCollector:
 ## Default collector for tracing
 tracesCollector:
   enabled: false
-  labels:
-    opentelemetry.io/opamp-managed: "true"
+  opampManaged: false
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -545,8 +542,7 @@ tracesCollector:
 
 logsCollector:
   enabled: false
-  labels:
-    opentelemetry.io/opamp-managed: "true"
+  opampManaged: false
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
