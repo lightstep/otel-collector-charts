@@ -39,8 +39,6 @@ autoinstrumentation:
 
 daemonCollector:
   name: daemon
-  opampManaged: false
-  opampReporting: true
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
   enabled: true
@@ -304,8 +302,6 @@ daemonCollector:
 
 # This is a singleton collector for cluster-level data
 clusterCollector:
-  opampManaged: false
-  opampReporting: true
   name: cluster-stats
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -427,8 +423,6 @@ clusterCollector:
 ## Default collector for tracing
 tracesCollector:
   enabled: false
-  opampManaged: false
-  opampReporting: true
   name: traces
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -545,8 +539,6 @@ tracesCollector:
 
 logsCollector:
   enabled: false
-  opampManaged: false
-  opampReporting: true
   name: logs
   clusterName: ""
   image: otel/opentelemetry-collector-contrib:0.88.0
@@ -748,6 +740,10 @@ collectors: []
 
 opAMPBridge:
   enabled: false
+  # Adds `opentelemetry.io/opamp-reporting: true` to all collectors
+  addReportingLabel: true
+  # Adds `opentelemetry.io/opamp-managed: true` to all collectors
+  addManagedLabel: false
   image:
     repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
     tag: "0.96.0"
