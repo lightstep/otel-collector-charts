@@ -12,12 +12,11 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
-    {{- if $collector.opampManaged }}
-    opentelemetry.io/opamp-managed: "true"
-    {{- end }}
-    {{- if $collector.opampReporting }}
+    {{ if $collector.opampReporting }}
     opentelemetry.io/opamp-reporting: "true"
-    {{- end }}
+    {{ else if $collector.opampManaged }}
+    opentelemetry.io/opamp-managed: "true"
+    {{ end }}
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}
