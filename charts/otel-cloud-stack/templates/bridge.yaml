@@ -178,7 +178,7 @@ subjects:
     {{- if $.Values.opAMPBridge.serviceAccount }}
     name: "{{ $.Values.opAMPBridge.serviceAccount }}"
     {{- else }}
-    name: "{{ (include "opentelemetry-opamp-bridge.fullname" .) }}-bridge-opamp-bridge"
+    name: "{{ (include "opentelemetry-opamp-bridge.fullname" .) }}-opamp-bridge"
     {{- end }}
     namespace: "{{ $.Release.Namespace }}"
 {{- end }}
