@@ -4,7 +4,8 @@ kind: OpAMPBridge
 metadata:
   name: {{ include "opentelemetry-opamp-bridge.fullname" . }}
   labels:
-    {{- include "otel-cloud-stack.labels" $ | indent 4 }}
+    {{- include "kube-otel-stack.labels" $ | indent 4 }}
+    {{- include "opentelemetry-opamp-bridge.labels" $ | indent 4 }}
     {{- with $.Values.opAMPBridge.labels }}
     {{- range $key, $value := . }}
     {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 4 }}
