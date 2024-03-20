@@ -12,6 +12,11 @@ metadata:
   {{- end }}
   labels:
     app: {{ $collectorName }}
+    {{- if and $.Values.opAMPBridge.enabled $.Values.opAMPBridge.addReportingLabel }}
+    opentelemetry.io/opamp-reporting: "true"
+    {{- else if and $.Values.opAMPBridge.enabled $.Values.opAMPBridge.addManagedLabel }}
+    opentelemetry.io/opamp-managed: "true"
+    {{- end }}
     {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
   {{- if $collector.nodeSelector }}

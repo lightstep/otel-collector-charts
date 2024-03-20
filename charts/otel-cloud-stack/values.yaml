@@ -737,3 +737,34 @@ logsCollector:
           exporters: [otlp]
 
 collectors: []
+
+opAMPBridge:
+  enabled: false
+  # Adds `opentelemetry.io/opamp-reporting: true` to all collectors
+  addReportingLabel: true
+  # Adds `opentelemetry.io/opamp-managed: true` to all collectors
+  addManagedLabel: false
+  image:
+    repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
+    tag: "0.96.0"
+  endpoint: "wss://opamp.lightstep.com/v1/opamp"
+  headers:
+    "Authorization": "bearer ${LS_OPAMP_API_KEY}"
+  env:
+    - name: LS_OPAMP_API_KEY
+      valueFrom:
+        secretKeyRef:
+          key: LS_OPAMP_API_KEY
+          name: otel-opamp-bridge-secret
+  capabilities:
+    AcceptsOpAMPConnectionSettings: true
+    AcceptsOtherConnectionSettings: true
+    AcceptsRemoteConfig: true
+    AcceptsRestartCommand: true
+    ReportsEffectiveConfig: true
+    ReportsHealth: true
+    ReportsOwnLogs: true
+    ReportsOwnMetrics: true
+    ReportsOwnTraces: true
+    ReportsRemoteConfig: true
+    ReportsStatus: true
