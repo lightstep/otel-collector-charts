@@ -2,10 +2,9 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpAMPBridge
 metadata:
-  name: {{ include "opentelemetry-opamp-bridge.fullname" . }}
+  name: {{ include "opentelemetry-opamp-bridge.fullname" $ }}
   labels:
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
-    {{- include "opentelemetry-opamp-bridge.labels" $ | indent 4 }}
     {{- with $.Values.opAMPBridge.labels }}
     {{- range $key, $value := . }}
     {{- printf "%s: %s" $key (tpl $value $ | quote) | nindent 4 }}
