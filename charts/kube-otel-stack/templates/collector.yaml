@@ -11,6 +11,11 @@ metadata:
     {{- toYaml . | nindent 4}}
   {{- end }}
   labels:
+    {{- if and $.Values.opAMPBridge.enabled $.Values.opAMPBridge.addReportingLabel }}
+    opentelemetry.io/opamp-reporting: "true"
+    {{- else if and $.Values.opAMPBridge.enabled $.Values.opAMPBridge.addManagedLabel }}
+    opentelemetry.io/opamp-managed: "true"
+    {{- end }}
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}

@@ -93,3 +93,29 @@ heritage: {{ $.Release.Service | quote }}
   {{- $userValue := index . 3 -}}
   {{- include "kube-otel-stack.kubeVersionDefaultValue" (list $values ">= 1.23-0" $insecure $secure $userValue) -}}
 {{- end -}}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "opentelemetry-opamp-bridge.fullname" -}}
+{{- if .fullnameOverride }}
+{{- .fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.opAMPBridge.name }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+{{/*
+Create the name of the clusterRole to use for the opampbridge
+*/}}
+{{- define "opentelemetry-opamp-bridge.clusterRoleName" -}}
+{{- printf "%s-bridge" .Release.Name  }}
+{{- end }}
