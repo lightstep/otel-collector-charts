@@ -129,6 +129,11 @@ spec:
       {{- end }}
   config: |
     exporters:
+      {{- if $.Values.otlpDestinationOverride }}
+      {{- if (dig "exporters" "otlp" "endpoint" false $collector.config) }}
+      {{- $_ := set $collector.config.exporters.otlp "endpoint" $.Values.otlpDestinationOverride }}
+      {{- end }}
+      {{- end }}
       {{- toYaml $collector.config.exporters | nindent 6 }}
     receivers:
       {{- if $collector.scrape_configs_file }}
