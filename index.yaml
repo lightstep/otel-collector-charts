@@ -24,6 +24,26 @@ entries:
   kube-otel-stack:
   - apiVersion: v2
     appVersion: 0.91.0
+    created: "2024-03-22T19:22:18.117020079Z"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.20.2
+    - condition: nodeExporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.3.0
+    description: Chart for sending Kubernetes metrics to Lightstep using the OpenTelemetry
+      Operator.
+    digest: 378569870e79df1236ee3d5140d435d0f07384a502db5b2886fe8c1fadb66c04
+    name: kube-otel-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/kube-otel-stack-0.5.1/kube-otel-stack-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
+    appVersion: 0.91.0
     created: "2024-03-21T16:34:49.58525525Z"
     dependencies:
     - condition: kubeStateMetrics.enabled
@@ -565,6 +585,16 @@ entries:
   otel-cloud-stack:
   - apiVersion: v2
     appVersion: 1.18.0
+    created: "2024-03-22T19:22:18.25741753Z"
+    description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
+    digest: 9dbe87a8d8424da20dc078a9f55108a260c7aa64bde9f1fd584d94784f92d482
+    name: otel-cloud-stack
+    type: application
+    urls:
+    - https://github.com/lightstep/otel-collector-charts/releases/download/otel-cloud-stack-0.4.1/otel-cloud-stack-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 1.18.0
     created: "2024-03-20T15:11:01.93627606Z"
     description: Use OpenTelemetry Collector to pull k8s metrics without Prometheus
     digest: 08eab238e6c8439b1d3df4a4a3045024a84163004b8d14b95fc4a6fb7f1a34d2
@@ -761,4 +791,4 @@ entries:
     urls:
     - https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/releases/download/otelcollector-0.1.1/otelcollector-0.1.1.tgz
     version: 0.1.1
-generated: "2024-03-21T16:34:49.585516006Z"
+generated: "2024-03-22T19:22:18.257662794Z"
