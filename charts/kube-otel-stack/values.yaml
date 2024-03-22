@@ -3,6 +3,7 @@ namespaceOverride: ""
 nameOverride: ""
 operatorNamespaceOverride: ""
 clusterName: "unknown"
+otlpDestinationOverride: ""
 
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
@@ -34,14 +35,14 @@ autoinstrumentation:
     argument: "0.25"
   languageSettings: {}
   # LanguageSettings defines the language specific settings for auto-instrumentation. Example:
-    # python:
-    #   env:
-    #     - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
-    #       value: "true"
-    #     - name: OTEL_TRACES_EXPORTER
-    #       value: "otlp"
-    #   image: "<custom-image>"
-    #   resources: {}
+  # python:
+  #   env:
+  #     - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
+  #       value: "true"
+  #     - name: OTEL_TRACES_EXPORTER
+  #       value: "otlp"
+  #   image: "<custom-image>"
+  #   resources: {}
   ## A list of corev1.EnvVars
   env: []
 
@@ -58,7 +59,7 @@ tracesCollector:
   name: traces
   clusterName: ""
 
-  image: otel/opentelemetry-collector-contrib:0.88.0
+  image: otel/opentelemetry-collector-contrib:0.96.0
   mode: deployment
   replicas: 1
   hpa:
@@ -219,7 +220,7 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.88.0
+  image: otel/opentelemetry-collector-contrib:0.96.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -232,7 +233,7 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.88.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.96.0
     prometheusCR:
       enabled: true
     # Override Default targetAllocator resources
@@ -347,7 +348,7 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.88.0
+  image: otel/opentelemetry-collector-contrib:0.96.0
   enabled: false
   mode: daemonset
   resources:
