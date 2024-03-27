@@ -1,0 +1,81 @@
+receivers:
+    prometheus/self:
+        config:
+            scrape_configs:
+              - job_name: otel-collector
+                scrape_interval: 5s
+                static_configs:
+                - labels:
+                    collector_name: sn-collector
+                  targets:
+                    - 0.0.0.0:8888
+    hostmetrics:
+        collection_interval: 5s
+        scrapers:
+            cpu:
+            disk:
+            # cpu and disk are only supported if build with CGO_ENABLED=1
+            load:
+            processes:
+            filesystem:
+            memory:
+            paging:
+            network:
+    otlp:
+        protocols:
+            grpc:
+                endpoint:
+            http:
+                endpoint:
+
+processors:
+    batch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+
+exporters:
+    otlp/ls:
+        endpoint: ingest.lightstep.com:443
+        headers:
+            lightstep-access-token: "${LIGHTSTEP_ACCESS_TOKEN}"
+        timeout: 5s
+        sending_queue:
+            enabled: true
+            num_consumers: 4
+            queue_size: 10
+        retry_on_failure:
+            enabled: true
+            max_elapsed_time: 30s
+        debug:
+            verbosity: basic
+            sampling_initial: 5
+            sampling_thereafter: 200
+
+extensions:
+    health_check:
+    opamp:
+        server:
+            ws:
+                endpoint: "wss://opamp.lightstep.com/v1/opamp"
+                headers:
+                    "Authorization": "bearer ${LS_OPAMP_API_KEY}"
+
+service:
+    extensions: [health_check, opamp]
+    telemetry:
+        metrics:
+          address: :8888
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [debug, otlp/ls]
+        metrics:
+            receivers: [otlp, prometheus/self, hostmetrics]
+            processors: [batch]
+            exporters: [debug, otlp/ls]
+        logs:
+            exporters: [debug, otlp/ls]
+            processors: [batch]
+            receivers: [otlp] # update with your receiver name
