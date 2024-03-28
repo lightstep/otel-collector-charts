@@ -6,7 +6,7 @@ ENV CGO_ENABLED=0
 
 # Note the version MUST MATCH otelarrowcol-build.yaml
 # Future optimization - curl the release.
-RUN go install go.opentelemetry.io/collector/cmd/builder@v0.96.0
+RUN go install go.opentelemetry.io/collector/cmd/builder@v0.97.0
 
 # This command generates main.go, go.mod but does not update deps.
 RUN builder --config=/otelarrowcol/otelcolarrow-build.yaml
