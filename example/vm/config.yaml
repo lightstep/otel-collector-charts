@@ -1,3 +1,18 @@
+# Date: March 22, 2024
+# Last Collector-Contrib Validation: v0.96.0
+
+# A receiver is how data gets into the OpenTelemetry Collector.
+# Generally, a receiver accepts data in a specified format,
+# translates it into the internal format and passes it to processors and exporters defined in the applicable pipelines.
+#
+# The recommended configuration is to enable the OpenTelemetry Protocol (OTLP) receiver for both gRPC and HTTP.
+# OTLP is the default protocol supported by all language implementations.
+# Depending on the environment, both grpc and http may not be necessary if the data being sent to the Collector only uses a single protocol.
+#
+# The hostmetrics receiver is OS-specific, so this configuration allows for different operating systems to be used.
+#
+# Additional receivers may be helpful to configure depending on the environment.
+
 receivers:
     prometheus/self:
         config:
@@ -28,12 +43,25 @@ receivers:
             http:
                 endpoint:
 
+# Processors are used at various stages of a pipeline.
+# Generally, a processor pre-processes data before it is exported (e.g. modify attributes or sample)
+# or helps ensure that data makes it through a pipeline successfully (e.g. batch/retry).
+#
+# The batch processor receives telemetry data and batches it before sending it to the exporter.
+# It improves the compression of the data and reduces the number of calls to emit the data from the Collector.
+# This processor can be configured to batch data for a certain duration or per batch size.
+
 processors:
     batch:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
 
+# An exporter is how data gets sent to different systems/back-ends.
+# Generally, an exporter translates the internal format into another defined format.
+#
+# When using the batch processor, a sending queue as well as debug exporter is required.
+# TODO- TALK ABOUT NUM_CONSUMERS AND QUEUE_SIZE
 exporters:
     otlp/ls:
         endpoint: ingest.lightstep.com:443
@@ -43,7 +71,7 @@ exporters:
         sending_queue:
             enabled: true
             num_consumers: 4
-            queue_size: 10
+            queue_size: 100
         retry_on_failure:
             enabled: true
             max_elapsed_time: 30s
@@ -52,6 +80,14 @@ exporters:
             sampling_initial: 5
             sampling_thereafter: 200
 
+# Extensions provide capabilities on top of the primary functionality of the collector.
+# Generally, extensions are used for implementing components that can be added to the Collector,
+# but which do not require direct access to telemetry data and are not part of the pipelines (like receivers, processors or exporters).
+#
+# The health check extension provides an endpoint that provides support to run liveness checks for the Collector.
+#
+# The OpAMP extension is an alternate to the OpAMP Bridge Kubernetes component,
+# to be used when collectors are not being run in Kubernetes. See more information in the Monitor Collector Health Doc.
 extensions:
     health_check:
     opamp:
@@ -60,6 +96,17 @@ extensions:
                 endpoint: "wss://opamp.lightstep.com/v1/opamp"
                 headers:
                     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
+
+# The service section is used to configure what components are enabled in the Collector
+# based on the configuration found in the receivers, processors, exporters, and extensions sections.
+#
+# We have defined the trace, metric, and log pipelines, which are default extensions, and Collector telemetry.
+# If a component is configured, but not defined within the service section then it is not enabled.
+#
+# We recommend enabling traces, metrics, and logs for the Collector.
+# At this time, metrics from the Collector are emitted using Prometheus,
+# which requires a Prometheus scraper to be configured to collect the data from the Collector.
+# 8888 is the default Prometheus endpoint.
 
 service:
     extensions: [health_check, opamp]
