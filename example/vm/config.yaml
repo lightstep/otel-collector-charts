@@ -15,12 +15,21 @@ receivers:
         collection_interval: 5s
         scrapers:
             cpu:
+                metrics:
+                    system.cpu.utilization:
+                        enabled: true
             disk:
             # cpu and disk are only supported if build with CGO_ENABLED=1
             load:
             processes:
             filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
             memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
             paging:
             network:
     otlp:
