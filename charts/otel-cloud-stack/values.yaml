@@ -740,7 +740,7 @@ logsCollector:
 collectors: []
 
 opAMPBridge:
-  enabled: false
+  enabled: true
   # Adds `opentelemetry.io/opamp-reporting: true` to all collectors
   addReportingLabel: true
   # Adds `opentelemetry.io/opamp-managed: true` to all collectors
