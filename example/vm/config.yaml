@@ -116,10 +116,10 @@ exporters:
             # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
             enabled: true
             max_elapsed_time: 30s
-        debug:
-            verbosity: basic
-            sampling_initial: 5
-            sampling_thereafter: 200
+    debug:
+        verbosity: basic
+        sampling_initial: 5
+        sampling_thereafter: 200
 
 extensions:
     health_check:
