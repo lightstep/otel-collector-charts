@@ -757,6 +757,7 @@ opAMPBridge:
         secretKeyRef:
           key: LS_OPAMP_API_KEY
           name: otel-opamp-bridge-secret
+          optional: true
   capabilities:
     AcceptsOpAMPConnectionSettings: true
     AcceptsOtherConnectionSettings: true
