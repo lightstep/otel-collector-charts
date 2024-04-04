@@ -1,4 +1,3 @@
-# Date: March 22, 2024
 # Last Collector-Contrib Validation: v0.96.0
 receivers:
     prometheus/self:
@@ -12,27 +11,71 @@ receivers:
                   targets:
                     - 0.0.0.0:8888
     hostmetrics:
-        collection_interval: 5s
+    # Hostmetrics scrapes metrics from various host systems.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
+        collection_interval: "30s"
+        root_path: /hostfs
         scrapers:
             cpu:
                 metrics:
                     system.cpu.utilization:
                         enabled: true
-            disk:
+            disk: {}
             # cpu and disk are only supported if build with CGO_ENABLED=1
-            load:
-            processes:
+            load: {}
             filesystem:
                 metrics:
                     system.filesystem.utilization:
                         enabled: true
+                exclude_mount_points:
+                    match_type: regexp
+                    mount_points:
+                        - /dev/.*
+                        - /proc/.*
+                        - /sys/.*
+                        - /run/k3s/containerd/.*
+                        - /var/lib/docker/.*
+                        - /var/lib/kubelet/.*
+                        - /snap/.*
+                exclude_fs_types:
+                    match_type: strict
+                    fs_types:
+                        - autofs
+                        - binfmt_misc
+                        - bpf
+                        - cgroup2
+                        - configfs
+                        - debugfs
+                        - devpts
+                        - devtmpfs
+                        - fusectl
+                        - hugetlbfs
+                        - iso9660
+                        - mqueue
+                        - nsfs
+                        - overlay
+                        - proc
+                        - procfs
+                        - pstore
+                        - rpc_pipefs
+                        - securityfs
+                        - selinuxfs
+                        - squashfs
+                        - sysfs
+                        - tracefs
             memory:
                 metrics:
                     system.memory.utilization:
                         enabled: true
-            paging:
-            network:
+            # paging:
+            # processes:
+            # process:
+            network: {}
     otlp:
+    # OTLP is the default protocol supported by all language implementations.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md
         protocols:
             grpc:
                 endpoint:
@@ -74,7 +117,8 @@ processors:
 
 exporters:
     otlp/ls:
-        endpoint: ingest.lightstep.com:443
+        endpoint: ingest.lightstep.com:443 # US data center
+        # endpoint: ingest.eu.lightstep.com:443 # EU data center
         headers:
             lightstep-access-token: "${LIGHTSTEP_ACCESS_TOKEN}"
         # While we expect latency under one second, typically, we
@@ -122,8 +166,14 @@ exporters:
         sampling_thereafter: 200
 
 extensions:
+    # The healthcheck extension provides an endpoint that provides
+    # support to run liveness checks for the Collector.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
     health_check:
-    # The OpAMP is an optional alternate to the OpAMP Bridge Kubernetes component.
+    # If this collector is not running in Kubernetes, we recommend adding
+    # this opampextension to report its config and status.
+    # For more details, see https://docs.lightstep.com/docs/monitor-collector-health
     opamp:
         server:
             ws:
