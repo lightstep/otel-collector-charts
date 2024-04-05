@@ -41,7 +41,9 @@ autoinstrumentation:
 daemonCollector:
   name: daemon
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image:
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   enabled: true
   mode: daemonset
   mountHostFS: true
@@ -305,7 +307,9 @@ daemonCollector:
 clusterCollector:
   name: cluster-stats
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   replicas: 1
   mode: deployment
   enabled: true
@@ -426,7 +430,9 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   mode: deployment
   hpa:
     minReplicas: 1
@@ -542,7 +548,9 @@ logsCollector:
   enabled: false
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   mode: daemonset
   resources:
     limits:

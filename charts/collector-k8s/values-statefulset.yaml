@@ -1,6 +1,6 @@
 collectors:
   - name: statefulset
-    image: otel/opentelemetry-collector-contrib:0.58.0
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.58.0
     enabled: true
     mode: statefulset
     replicas: 3

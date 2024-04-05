@@ -19,7 +19,7 @@ metadata:
     {{- include "kube-otel-stack.labels" $ | indent 4 }}
 spec:
   mode: {{ $collector.mode }}
-  image: {{ $collector.image }}
+  image: "{{ $collector.image.repository }}:{{ $collector.image.tag | default $.Chart.AppVersion }}"
   replicas: {{ $collector.replicas | default 1 }}
   {{- with $collector.hpa }}
   {{- if .enabled }}
@@ -44,7 +44,7 @@ spec:
 {{- if $collector.targetallocator.enabled }}
   targetAllocator:
     enabled: true
-    image: {{ $collector.targetallocator.image }}
+    image: "{{ $collector.targetallocator.image.repository }}:{{ $collector.targetallocator.image.tag | default $.Chart.AppVersion }}"
     replicas: {{ $collector.targetallocator.replicas }}
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
     {{- if $collector.targetallocator.resources }}

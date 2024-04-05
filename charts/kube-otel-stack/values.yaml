@@ -59,7 +59,9 @@ tracesCollector:
   name: traces
   clusterName: ""
 
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   mode: deployment
   replicas: 1
   hpa:
@@ -220,7 +222,9 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   enabled: true
   mode: statefulset
   replicas: 3
@@ -233,7 +237,9 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.96.0
+    image: 
+      repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+      tag: "0.96.0"
     prometheusCR:
       enabled: true
     # Override Default targetAllocator resources
@@ -348,7 +354,9 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: 
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: "0.96.0"
   enabled: false
   mode: daemonset
   resources:
