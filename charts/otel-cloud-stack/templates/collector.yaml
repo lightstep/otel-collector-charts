@@ -28,7 +28,7 @@ spec:
     {{- $collector.tolerations | toYaml | nindent 4 }}
   {{- end }}
   mode: {{ $collector.mode }}
-  image: {{ $collector.image }}
+  image: "{{ $collector.image.repository }}:{{ $collector.image.tag | default $.Chart.AppVersion }}"
   {{- if not (eq $collector.mode "daemonset") }}
   replicas: {{ $collector.replicas | default 1 }}
   {{- end }}
@@ -51,7 +51,7 @@ spec:
 {{- if $collector.targetallocator.enabled }}
   targetAllocator:
     enabled: true
-    image: {{ $collector.targetallocator.image }}
+    image: "{{ $collector.targetallocator.image.repository }}:{{ $collector.targetallocator.image.tag | default $.Chart.AppVersion }}"
     replicas: {{ $collector.targetallocator.replicas }}
     allocationStrategy: {{ $collector.targetallocator.allocationStrategy }}
     {{- if $collector.targetallocator.resources }}

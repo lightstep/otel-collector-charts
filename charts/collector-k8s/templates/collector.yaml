@@ -7,7 +7,7 @@ metadata:
   name: "{{ $collectorName }}"
 spec:
   mode: {{ $collector.mode }}
-  image: {{ $collector.image }}
+  image: "{{ $collector.image.repository }}:{{ $collector.image.tag | default $.Chart.AppVersion }}"
   replicas: {{ $collector.replicas | default 1 }}
   ports:
     - name: "metrics"
@@ -16,7 +16,7 @@ spec:
 {{- if eq $collector.mode "statefulset" }}
   targetAllocator:
     enabled: true
-    image: {{ $collector.targetallocator.image }}
+    image: "{{ $collector.targetallocator.image.repository }}:{{ $collector.targetallocator.image.tag | default $.Chart.AppVersion }}"
     serviceAccount: {{ $.Release.Name }}-collector-targetallocator
     prometheusCR:
       enabled: {{ $collector.targetallocator.prometheusCR.enabled }}

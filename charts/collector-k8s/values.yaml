@@ -1,6 +1,8 @@
 collectors:
   - name: deployment
-    image: otel/opentelemetry-collector-contrib:0.61.0
+    image:
+      repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+      tag: "0.61.0"
     replicas: 1
     enabled: true
     scrape_configs_file: scrape_configs.yaml
