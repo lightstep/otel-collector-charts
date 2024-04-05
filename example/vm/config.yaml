@@ -1,19 +1,26 @@
 # Last Collector-Contrib Validation: v0.96.0
 receivers:
+    # Receivers bring data into the OpenTelemetry Collector.
+    # Generally, a receiver accepts data in a specified format,
+    # translates it into the internal format, and passes it to
+    # processors and exporters defined in the applicable pipelines.
     prometheus/self:
+        # Prometheus is used to monitor the collector, so it receives metric data in this format.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md
         config:
             scrape_configs:
-              - job_name: otel-collector
-                scrape_interval: 5s
-                static_configs:
-                - labels:
-                    collector_name: sn-collector
-                  targets:
-                    - 0.0.0.0:8888
+                - job_name: otel-collector
+                  scrape_interval: 5s
+                  static_configs:
+                      - labels:
+                            collector_name: sn-collector
+                        targets:
+                            - 0.0.0.0:8888
     hostmetrics:
-    # Hostmetrics scrapes metrics from various host systems.
-    # For more details, see
-    # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
+        # Hostmetrics scrapes metrics from various host systems.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
         collection_interval: "30s"
         root_path: /hostfs
         scrapers:
@@ -73,15 +80,23 @@ receivers:
             # process:
             network: {}
     otlp:
-    # OTLP is the default protocol supported by all language implementations.
-    # For more details, see
-    # https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md
+        # OTLP is the default protocol supported by all language implementations.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md
         protocols:
             grpc:
                 endpoint:
             http:
                 endpoint:
 processors:
+    # Processors pre-process data before it is exported (e.g. modify attributes or sample)
+    # or help ensure that data makes it through a pipeline successfully (e.g. batch/retry).
+    #
+    # The batch processor receives telemetry data and batches it before sending it to the exporter.
+    # It improves the compression of the data and reduces the number of calls to emit the data from the Collector.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor#batch-processor
+    #
     # We recommend use of the batch processor.  We recommend the settings
     # below for traces.
     #
@@ -114,8 +129,20 @@ processors:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
+    resourcedetection/env:
+        # This is used to gather resource information from the host and is used in the resource value of telemetry data.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/resourcedetectionprocessor/README.md
+        detectors: [ env ]
+        timeout: 2s
+        override: false
 
 exporters:
+    # An exporter is how data gets sent to different systems/back-ends.
+    # Generally, an exporter translates the internal format into another defined format.
+    # Cloud Observability supports OTLP natively for all signals.
+    # Therefore the only required exporter is the OTLP exporter, which requires a Cloud Observability access token.
+    # The example extracts the access token from an environment variable, to avoid hard-coding this in the configuration file.
     otlp/ls:
         endpoint: ingest.lightstep.com:443 # US data center
         # endpoint: ingest.eu.lightstep.com:443 # EU data center
@@ -147,7 +174,7 @@ exporters:
         retry_on_failure:
             # We recommend disabling retries, since while the export is
             # blocked it is likely that arriving spans will drop, and
-            # Otherwise, collectors will need substantial additional
+            # otherwise, collectors will need substantial additional
             # memory to survive transient failures.  Nevertheless, we
             # recommend a limited retry policy to gracefully occasional
             # failures, paired with a modest queue size.
@@ -161,20 +188,27 @@ exporters:
             enabled: true
             max_elapsed_time: 30s
     debug:
+        # Use the debug exporter for outputting data to the console.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/debugexporter/README.md
         verbosity: basic
         sampling_initial: 5
         sampling_thereafter: 200
 
 extensions:
-    # The healthcheck extension provides an endpoint that provides
-    # support to run liveness checks for the Collector.
+    # Extensions provide capabilities on top of the primary functionality of the collector.
+    # Generally, extensions are used for implementing components that can be added to the Collector,
+    # but don't require direct access to telemetry data and aren't part of the pipelines (like receivers, processors, or exporters).
+    health_check:
+    # The healthcheck extension provides an endpoint that
+    # supports running liveness checks for the Collector.
     # For more details, see
     # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
-    health_check:
-    # If this collector is not running in Kubernetes, we recommend adding
-    # this opampextension to report its config and status.
-    # For more details, see https://docs.lightstep.com/docs/monitor-collector-health
     opamp:
+        # If this collector is not running in Kubernetes, we recommend adding
+        # this opampextension to report on the Collector config and status.
+        # For more details or if running the collector in Kubernetes,
+        # see https://docs.lightstep.com/docs/monitor-collector-health
         server:
             ws:
                 endpoint: "wss://opamp.lightstep.com/v1/opamp"
@@ -182,20 +216,25 @@ extensions:
                     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
 
 service:
+    # The service section configures the enabled components in the Collector
+    # based on the configuration found in the receivers, processors, exporters, and extensions sections.
+    # This config defines the trace, metric, and log pipelines, the Cloud Observability
+    # default extensions, and Collector telemetry.
+    # If a component is configured but not defined in the service section, then it's not enabled.
     extensions: [health_check, opamp]
     telemetry:
         metrics:
-          address: :8888
+            address: :8888
     pipelines:
         traces:
             receivers: [otlp]
-            processors: [batch]
+            processors: [batch, resourcedetection/env]
             exporters: [debug, otlp/ls]
         metrics:
             receivers: [otlp, prometheus/self, hostmetrics]
-            processors: [batch]
+            processors: [batch, resourcedetection/env]
             exporters: [debug, otlp/ls]
         logs:
             exporters: [debug, otlp/ls]
-            processors: [batch]
+            processors: [batch, resourcedetection/env]
             receivers: [otlp] # update with your receiver name
