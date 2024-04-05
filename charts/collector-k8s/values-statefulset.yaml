@@ -1,12 +1,16 @@
 collectors:
   - name: statefulset
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.58.0
+    image:
+      repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+      tag: "0.58.0"
     enabled: true
     mode: statefulset
     replicas: 3
     targetallocator:
       enabled: true
-      image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.1.0
+      image: 
+        repository: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator
+        tag: "0.1.0"
       prometheusCR:
         enabled: false
     scrape_configs_file: scrape_configs_statefulset.yaml

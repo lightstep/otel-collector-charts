@@ -2,7 +2,9 @@ collectors:
   # The deployment collector should be configured to scrape infrastructure or static targets.
   - name: deployment
     enabled: false
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.58.0
+    image:
+      repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+      tag: "0.58.0"
     scrape_configs_file: scrape_configs.yaml
     resources:
       limits:
