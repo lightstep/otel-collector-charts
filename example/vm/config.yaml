@@ -22,7 +22,7 @@ receivers:
         # For more details, see
         # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
         collection_interval: "30s"
-        root_path: /hostfs
+        # root_path: /hostfs # Linux only
         scrapers:
             cpu:
                 metrics:
@@ -205,13 +205,14 @@ extensions:
     # For more details, see
     # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
     opamp:
-        # If this collector is not running in Kubernetes, we recommend adding
+        # If this collector :is not running in Kubernetes, we recommend adding
         # this opampextension to report on the Collector config and status.
         # For more details or if running the collector in Kubernetes,
         # see https://docs.lightstep.com/docs/monitor-collector-health
         server:
             ws:
                 endpoint: "wss://opamp.lightstep.com/v1/opamp"
+                # endpoint: "wss://opamp.eu.lightstep.com/v1/opamp" # EU data center
                 headers:
                     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
 
