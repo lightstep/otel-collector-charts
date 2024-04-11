@@ -1,0 +1,241 @@
+# Last Collector-Contrib Validation: v0.96.0
+receivers:
+    # Receivers bring data into the OpenTelemetry Collector.
+    # Generally, a receiver accepts data in a specified format,
+    # translates it into the internal format, and passes it to
+    # processors and exporters defined in the applicable pipelines.
+    prometheus/self:
+        # Prometheus is used to monitor the collector, so it receives metric data in this format.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md
+        config:
+            scrape_configs:
+                - job_name: otel-collector
+                  scrape_interval: 5s
+                  static_configs:
+                      - labels:
+                            collector_name: sn-collector
+                        targets:
+                            - 0.0.0.0:8888
+    hostmetrics:
+        # Hostmetrics scrapes metrics from various host systems.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/hostmetricsreceiver/README.md
+        collection_interval: "30s"
+        # root_path: /hostfs # Linux only
+        scrapers:
+            cpu:
+                metrics:
+                    system.cpu.utilization:
+                        enabled: true
+            disk: {}
+            # cpu and disk are only supported if build with CGO_ENABLED=1
+            load: {}
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+                exclude_mount_points:
+                    match_type: regexp
+                    mount_points:
+                        - /dev/.*
+                        - /proc/.*
+                        - /sys/.*
+                        - /run/k3s/containerd/.*
+                        - /var/lib/docker/.*
+                        - /var/lib/kubelet/.*
+                        - /snap/.*
+                exclude_fs_types:
+                    match_type: strict
+                    fs_types:
+                        - autofs
+                        - binfmt_misc
+                        - bpf
+                        - cgroup2
+                        - configfs
+                        - debugfs
+                        - devpts
+                        - devtmpfs
+                        - fusectl
+                        - hugetlbfs
+                        - iso9660
+                        - mqueue
+                        - nsfs
+                        - overlay
+                        - proc
+                        - procfs
+                        - pstore
+                        - rpc_pipefs
+                        - securityfs
+                        - selinuxfs
+                        - squashfs
+                        - sysfs
+                        - tracefs
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            # paging:
+            # processes:
+            # process:
+            network: {}
+    otlp:
+        # OTLP is the default protocol supported by all language implementations.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/otlpreceiver/README.md
+        protocols:
+            grpc:
+                endpoint:
+            http:
+                endpoint:
+processors:
+    # Processors pre-process data before it is exported (e.g. modify attributes or sample)
+    # or help ensure that data makes it through a pipeline successfully (e.g. batch/retry).
+    #
+    # The batch processor receives telemetry data and batches it before sending it to the exporter.
+    # It improves the compression of the data and reduces the number of calls to emit the data from the Collector.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor#batch-processor
+    #
+    # We recommend use of the batch processor.  We recommend the settings
+    # below for traces.
+    #
+    # Note: We are aware of ongoing efforts within OpenTelemetry to
+    # configure batching in the exporter, where it is possible to
+    # configure batch size limits in terms of bytes, instead of items.
+    # We will update these recommendations when batching by size is
+    # available.
+    batch:
+        # In this example, the processor will wait to accumulate at least
+        # 1000 spans for up to 1 second, then flush the batch.  In cases
+        # where the arriving data is already batched, such that combining
+        # the pending batch with the arriving data would exceed 1500
+        # items, then 1500 items will be sent by splitting the data.
+        #
+        # Note: the batch processor has a side-effect of returning success
+        # to the producer, before waiting for the consumer to respond.
+        # This is appropriate default in most cases, it means that SDKs
+        # sending to the gateway will not see or report errors.
+        #
+        # The batch processor responds to "back-pressure" from the
+        # exporter, meaning it is never directly responsible for dropping
+        # spans.  Note that our current recommendation for exporter
+        # settings does not respond with back-pressure to the batch
+        # processor.  Due to exporter settings, this collector
+        # configuration will drop data when the ServiceNow service is
+        # (intentionally or accidentally) refusing data, instead of
+        # applying pressure backward, discussed in the `exporters`
+        # section.
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+    resourcedetection/env:
+        # This is used to gather resource information from the host and is used in the resource value of telemetry data.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/resourcedetectionprocessor/README.md
+        detectors: [ env ]
+        timeout: 2s
+        override: false
+
+exporters:
+    # An exporter is how data gets sent to different systems/back-ends.
+    # Generally, an exporter translates the internal format into another defined format.
+    # Cloud Observability supports OTLP natively for all signals.
+    # Therefore the only required exporter is the OTLP exporter, which requires a Cloud Observability access token.
+    # The example extracts the access token from an environment variable, to avoid hard-coding this in the configuration file.
+    otlp/ls:
+        endpoint: ingest.lightstep.com:443 # US data center
+        # endpoint: ingest.eu.lightstep.com:443 # EU data center
+        headers:
+            lightstep-access-token: "${LIGHTSTEP_ACCESS_TOKEN}"
+        # While we expect latency under one second, typically, we
+        # recommend a longer timeout than the default.
+        timeout: 5s
+        # Queue settings are required.  It does not make sense to use
+        # the exporter without a queue, it has to do with
+        # requiring the "num_consumers" limit configured in this
+        # section (i.e., we require a queue in order to limit the
+        # number of concurrent exports).
+        #
+        # Note that the queue settings are applied in unit-terms
+        # produced by the batch processor, so a number like 100 means
+        # the queue has support for 100 pre-batched items.  With up to
+        # 1500 spans each (from the batch processor), this
+        # configuration allows 150,000 spans to occupy memory.
+        sending_queue:
+            enabled: true
+            num_consumers: 4
+            queue_size: 100
+        # Retry settings are optional.
+        #
+        # Note that while retries are attempted, this component will
+        # begin to drop arriving data if the queue is not large
+        # enough.
+        retry_on_failure:
+            # We recommend disabling retries, since while the export is
+            # blocked it is likely that arriving spans will drop, and
+            # otherwise, collectors will need substantial additional
+            # memory to survive transient failures.  Nevertheless, we
+            # recommend a limited retry policy to gracefully occasional
+            # failures, paired with a modest queue size.
+            #
+            # Note there is a persistent storage option inherited from a
+            # common collector component.  When persistent storage is
+            # configured, the default retry configuration is sensible.
+            #
+            # For more details on retry and queue settings, please refer to
+            # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
+            enabled: true
+            max_elapsed_time: 30s
+    debug:
+        # Use the debug exporter for outputting data to the console.
+        # For more details, see
+        # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/debugexporter/README.md
+        verbosity: basic
+        sampling_initial: 5
+        sampling_thereafter: 200
+
+extensions:
+    # Extensions provide capabilities on top of the primary functionality of the collector.
+    # Generally, extensions are used for implementing components that can be added to the Collector,
+    # but don't require direct access to telemetry data and aren't part of the pipelines (like receivers, processors, or exporters).
+    health_check:
+    # The healthcheck extension provides an endpoint that
+    # supports running liveness checks for the Collector.
+    # For more details, see
+    # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
+    opamp:
+        # If this collector :is not running in Kubernetes, we recommend adding
+        # this opampextension to report on the Collector config and status.
+        # For more details or if running the collector in Kubernetes,
+        # see https://docs.lightstep.com/docs/monitor-collector-health
+        server:
+            ws:
+                endpoint: "wss://opamp.lightstep.com/v1/opamp"
+                # endpoint: "wss://opamp.eu.lightstep.com/v1/opamp" # EU data center
+                headers:
+                    "Authorization": "bearer ${LS_OPAMP_API_KEY}"
+
+service:
+    # The service section configures the enabled components in the Collector
+    # based on the configuration found in the receivers, processors, exporters, and extensions sections.
+    # This config defines the trace, metric, and log pipelines, the Cloud Observability
+    # default extensions, and Collector telemetry.
+    # If a component is configured but not defined in the service section, then it's not enabled.
+    extensions: [health_check, opamp]
+    telemetry:
+        metrics:
+            address: :8888
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch, resourcedetection/env]
+            exporters: [debug, otlp/ls]
+        metrics:
+            receivers: [otlp, prometheus/self, hostmetrics]
+            processors: [batch, resourcedetection/env]
+            exporters: [debug, otlp/ls]
+        logs:
+            exporters: [debug, otlp/ls]
+            processors: [batch, resourcedetection/env]
+            receivers: [otlp] # update with your receiver name
