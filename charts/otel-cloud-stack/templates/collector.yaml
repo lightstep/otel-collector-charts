@@ -19,6 +19,10 @@ metadata:
     {{- end }}
     {{- include "otel-cloud-stack.labels" $ | indent 4 }}
 spec:
+  {{- if $collector.additionalContainers }}
+  additionalContainers:
+    {{- $collector.additionalContainers | toYaml | nindent 4 }}
+  {{- end }}
   {{- if $collector.nodeSelector }}
   nodeSelector:
     {{- $collector.nodeSelector | toYaml | nindent 4 }}
@@ -128,6 +132,10 @@ spec:
       value: "k8s.cluster.name={{ $collector.clusterName | default $.Values.clusterName }}"
       {{- end }}
   config: |
+    {{- if $collector.config.extensions }}
+    extensions:
+       {{- toYaml $collector.config.extensions | nindent 6 }}
+    {{- end }}
     exporters:
       {{- if $.Values.otlpDestinationOverride }}
       {{- if (dig "exporters" "otlp" "endpoint" false $collector.config) }}

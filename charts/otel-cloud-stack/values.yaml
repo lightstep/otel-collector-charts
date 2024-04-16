@@ -41,7 +41,7 @@ autoinstrumentation:
 daemonCollector:
   name: daemon
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.97.0
   enabled: true
   mode: daemonset
   mountHostFS: true
@@ -53,13 +53,28 @@ daemonCollector:
           name: otel-collector-secret
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 250Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
   scrape_configs_file: "daemon_scrape_configs.yaml"
+  additionalContainers:
+    - name: tails
+      image: ghcr.io/jaronoff97/tails:v0.0.5
+      env:
+        - name: SECRET_KEY_BASE
+          value: nErlTbssfnJxvjjujVKgDO/q84XAggf6/kN6b926qjRFK+uasVyd/+oACdXLm38l
+      ports:
+        - containerPort: 4000
   config:
+    extensions:
+      opamp:
+        server:
+          ws:
+            endpoint: ws://127.0.0.1:4000/v1/opamp
+            tls:
+              insecure: true
     receivers:
       # OTel-Arrow notes: For this collector to receive OTel-Arrow in
       # addition to standard forms of OTLP, use an image with the
@@ -146,6 +161,8 @@ daemonCollector:
           # process:
           network: {}
     processors:
+      remotetap:
+        endpoint: localhost:12001
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
@@ -292,6 +309,7 @@ daemonCollector:
           exporters:
             - otlp
           processors:
+            - remotetap
             - resourcedetection/env
             - k8sattributes
             - batch
@@ -305,17 +323,17 @@ daemonCollector:
 clusterCollector:
   name: cluster-stats
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.97.0
   replicas: 1
   mode: deployment
   enabled: true
   mountHostFS: false
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 500Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 500Mi
   env:
     - name: LS_TOKEN
@@ -426,7 +444,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.97.0
   mode: deployment
   hpa:
     minReplicas: 1
@@ -542,14 +560,14 @@ logsCollector:
   enabled: false
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.97.0
   mode: daemonset
   resources:
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 250Mi
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128Mi
   env:
     - name: LS_TOKEN
@@ -571,7 +589,23 @@ logsCollector:
     - name: varlibdockercontainers
       hostPath:
         path: /var/lib/docker/containers
+
+  additionalContainers:
+    - name: tails
+      image: ghcr.io/jaronoff97/tails:v0.0.5
+      env:
+        - name: SECRET_KEY_BASE
+          value: nErlTbssfnJxvjjujVKgDO/q84XAggf6/kN6b926qjRFK+uasVyd/+oACdXLm38l
+      ports:
+        - containerPort: 4000
   config:
+    extensions:
+      opamp:
+        server:
+          ws:
+            endpoint: ws://127.0.0.1:4000/v1/opamp
+            tls:
+              insecure: true
     receivers:
       k8s_events: {}
       # inspired by https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/081678933ad0246a0fcb9564c8f1871480a306aa/examples/kubernetes/otel-collector-config.yml
@@ -647,6 +681,8 @@ logsCollector:
             from: attributes.uid
             to: resource["k8s.pod.uid"]
     processors:
+      remotetap:
+        endpoint: localhost:12001
       memory_limiter:
         check_interval: 1s
         limit_percentage: 75
@@ -734,20 +770,21 @@ logsCollector:
             - memory_limiter
             - resourcedetection/env
             - k8sattributes
+            - remotetap
             - batch
           exporters: [otlp]
 
 collectors: []
 
 opAMPBridge:
-  enabled: true
+  enabled: false
   # Adds `opentelemetry.io/opamp-reporting: true` to all collectors
   addReportingLabel: true
   # Adds `opentelemetry.io/opamp-managed: true` to all collectors
   addManagedLabel: false
   image:
     repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
-    tag: "0.96.0"
+    tag: "0.97.0"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"
   headers:
     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
