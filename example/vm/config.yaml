@@ -142,7 +142,7 @@ processors:
             - key: service.version
               action: insert
               from_value: service_version
-            - key: service.version
+            - key: service.name
               action: upsert
               from_value: collector_name
     resourcedetection/env:
