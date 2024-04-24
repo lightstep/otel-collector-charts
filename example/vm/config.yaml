@@ -141,10 +141,10 @@ processors:
             # https://opentelemetry.io/docs/specs/semconv/attributes-registry/service/
             - key: service.version
               action: insert
-              from_value: service_version
+              from_attribute: service_version
             - key: service.name
               action: upsert
-              from_value: service_name
+              from_attribute: service_name
     resourcedetection/env:
         # This is used to gather resource information from the host and is used in the resource value of telemetry data.
         # For more details, see
