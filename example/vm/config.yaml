@@ -144,7 +144,7 @@ processors:
               from_value: service_version
             - key: service.name
               action: upsert
-              from_value: collector_name
+              from_value: service_name
     resourcedetection/env:
         # This is used to gather resource information from the host and is used in the resource value of telemetry data.
         # For more details, see
