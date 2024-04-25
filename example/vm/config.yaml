@@ -134,14 +134,17 @@ processors:
         # For more details, see:
         # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor
         actions:
-            # In this case, the attributes processor maps the `service_version` attribute attached
-            # to telemetry from the prometheus/self receiver to `service.version` following OTel
-            # semantic conventions for service attributes.
+            # In this case, the attributes processor maps service attributes attached to telemetry
+            # from the prometheus/self receiver to service attributes following OTel semantic
+            # conventions for service attributes.
             # For more details, see:
             # https://opentelemetry.io/docs/specs/semconv/attributes-registry/service/
             - key: service.version
               action: insert
-              from_value: service_version
+              from_attribute: service_version
+            - key: service.name
+              action: upsert
+              from_attribute: service_name
     resourcedetection/env:
         # This is used to gather resource information from the host and is used in the resource value of telemetry data.
         # For more details, see
@@ -242,13 +245,13 @@ service:
     pipelines:
         traces:
             receivers: [otlp]
-            processors: [batch, resourcedetection/env]
+            processors: [resourcedetection/env, attributes, batch]
             exporters: [debug, otlp/ls]
         metrics:
             receivers: [otlp, prometheus/self, hostmetrics]
-            processors: [batch, resourcedetection/env]
+            processors: [resourcedetection/env, attributes, batch]
             exporters: [debug, otlp/ls]
         logs:
             exporters: [debug, otlp/ls]
-            processors: [batch, resourcedetection/env]
+            processors: [resourcedetection/env, attributes, batch]
             receivers: [otlp] # update with your receiver name
