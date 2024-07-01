@@ -41,7 +41,7 @@ autoinstrumentation:
 daemonCollector:
   name: daemon
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.103.0
   enabled: true
   mode: daemonset
   mountHostFS: true
@@ -305,7 +305,7 @@ daemonCollector:
 clusterCollector:
   name: cluster-stats
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.103.0
   replicas: 1
   mode: deployment
   enabled: true
@@ -426,7 +426,7 @@ tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.103.0
   mode: deployment
   hpa:
     minReplicas: 1
@@ -542,7 +542,7 @@ logsCollector:
   enabled: false
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.96.0
+  image: otel/opentelemetry-collector-contrib:0.103.0
   mode: daemonset
   resources:
     limits:
@@ -747,7 +747,7 @@ opAMPBridge:
   addManagedLabel: false
   image:
     repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
-    tag: "0.96.0"
+    tag: "0.103.0"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"
   headers:
     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
