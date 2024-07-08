@@ -38,6 +38,11 @@ autoinstrumentation:
   ## https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/overview.md#resources
   resource: {}
 
+## OpenTelemetry Collector Kubernetes Distro - Otel Operator
+manager:
+  collectorImage:
+    repository: "otel/opentelemetry-collector-k8s"
+
 daemonCollector:
   name: daemon
   clusterName: ""
