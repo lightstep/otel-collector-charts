@@ -5,11 +5,6 @@ operatorNamespaceOverride: ""
 clusterName: "unknown"
 otlpDestinationOverride: ""
 
-## OpenTelemetry Collector Kubernetes Distro - Otel Operator
-manager:
-  collectorImage:
-    repository: "otel/opentelemetry-collector-k8s"
-
 ## Auto-Instrumentation resource to be installed in the cluster
 ## Can be used by setting the following:
 ##  Java: instrumentation.opentelemetry.io/inject-java: "true"

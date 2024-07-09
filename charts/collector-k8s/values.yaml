@@ -1,8 +1,3 @@
-## OpenTelemetry Collector Kubernetes Distro - Otel Operator
-manager:
-  collectorImage:
-    repository: "otel/opentelemetry-collector-k8s"
-
 collectors:
   - name: deployment
     image: otel/opentelemetry-collector-contrib:0.61.0
