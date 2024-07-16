@@ -1,4 +1,4 @@
-# Last Collector-Contrib Validation: v0.96.0
+# Last Collector-Contrib Validation: v0.103.0
 receivers:
     # Receivers bring data into the OpenTelemetry Collector.
     # Generally, a receiver accepts data in a specified format,
@@ -149,7 +149,7 @@ processors:
         # This is used to gather resource information from the host and is used in the resource value of telemetry data.
         # For more details, see
         # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/resourcedetectionprocessor/README.md
-        detectors: [ env ]
+        detectors: [env]
         timeout: 2s
         override: false
 
