@@ -2,7 +2,7 @@
 
 Our deployment process is powered by GitHub Actions.
 
-#### After Merging to Main
+## After Merging to Main
 
 Once your changes have been merged into the main branch:
 

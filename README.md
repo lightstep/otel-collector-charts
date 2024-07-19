@@ -40,3 +40,9 @@ the prebuilt image or a customer collector build at this time.
 See the [recommended custom collector build
 configuration](./arrow/otelcolarrow-build.yaml) as a starting
 point.
+
+---
+
+## Contributing and Developing
+
+Please see [CONTRIBUTING.md.](./CONTRIBUTING.md)
