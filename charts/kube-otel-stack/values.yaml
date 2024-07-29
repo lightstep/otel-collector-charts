@@ -59,7 +59,7 @@ tracesCollector:
   name: traces
   clusterName: ""
 
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   mode: deployment
   replicas: 1
   hpa:
@@ -220,7 +220,7 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -348,7 +348,7 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   enabled: false
   mode: daemonset
   resources:

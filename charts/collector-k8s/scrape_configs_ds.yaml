@@ -1,26 +1,27 @@
 - job_name: otel-collector
   scrape_interval: 5s
   static_configs:
-  - labels:
-      collector_name: ${KUBE_POD_NAME}
-    targets:
-      - 0.0.0.0:8888
+    - labels:
+        collector_name: ${env:KUBE_POD_NAME}
+      targets:
+        - 0.0.0.0:8888
 - job_name: apps
   kubernetes_sd_configs:
-  - role: pod
-    selectors:
     - role: pod
-      # only scrape data from pods running on the same node as collector
-      field: "spec.nodeName=$KUBE_NODE_NAME"
+      selectors:
+        - role: pod
+          # only scrape data from pods running on the same node as collector
+          field: "spec.nodeName=${env:KUBE_POD_NAME}"
   relabel_configs:
-  # scrape pods annotated with "prometheus.io/scrape: true"
-  - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-    regex: "true"
-    action: keep
-  # read the port from "prometheus.io/port: <port>" annotation and update scraping address accordingly
-  - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-    action: replace
-    target_label: __address__
-    regex: ([^:]+)(?::\d+)?;(\d+)
-    # escaped $1:$2
-    replacement: $$1:$$2
+    # scrape pods annotated with "prometheus.io/scrape: true"
+    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+      regex: "true"
+      action: keep
+    # read the port from "prometheus.io/port: <port>" annotation and update scraping address accordingly
+    - source_labels:
+        [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+      action: replace
+      target_label: __address__
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      # escaped $1:$2
+      replacement: $$1:$$2
