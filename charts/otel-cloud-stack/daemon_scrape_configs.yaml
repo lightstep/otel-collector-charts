@@ -6,7 +6,7 @@
       selectors:
         - role: pod
           # only scrape data from pods running on the same node as collector
-          field: "spec.nodeName=${env:OTEL_K8S_NODE_NAME}"
+          field: "spec.nodeName=${env:K8S_NODE_NAME}"
   relabel_configs:
     - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
       action: keep
@@ -54,7 +54,7 @@
       regex: __meta_kubernetes_node_label_(.+)
     - action: replace
       regex: "(.*)"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - job
@@ -76,41 +76,41 @@
       # selectors:
       # - role: node
       #   # only scrape data from pods running on the same node as collector
-      #   field: "metadata.name=${env:OTEL_K8S_NODE_NAME}"
+      #   field: "metadata.name=${env:K8S_NODE_NAME}"
   metric_relabel_configs:
     - action: drop
       regex: container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __name__
     - action: drop
       regex: container_fs_(io_current|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __name__
     - action: drop
       regex: container_memory_(mapped_file|swap)
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __name__
     - action: drop
       regex: container_(file_descriptors|tasks_state|threads_max)
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __name__
     - action: drop
       regex: container_spec.*
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __name__
     - action: drop
       regex: ".+;"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - id
@@ -119,7 +119,7 @@
   relabel_configs:
     - action: replace
       regex: "(.*)"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - job
@@ -129,7 +129,7 @@
       target_label: job
     - action: replace
       regex: "(.*)"
-      replacement: "${1}"
+      replacement: "$${1}"
       separator: ";"
       source_labels:
         - __meta_kubernetes_node_name
@@ -141,7 +141,7 @@
       target_label: endpoint
     - action: replace
       regex: "(.*)"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __metrics_path__
@@ -149,14 +149,14 @@
     - action: hashmod
       modulus: 1
       regex: "(.*)"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __address__
       target_label: __tmp_hash
     - action: keep
       regex: "$(SHARD)"
-      replacement: "$1"
+      replacement: "$$1"
       separator: ";"
       source_labels:
         - __tmp_hash
