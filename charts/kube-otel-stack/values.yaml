@@ -59,7 +59,7 @@ tracesCollector:
   name: traces
   clusterName: ""
 
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   mode: deployment
   replicas: 1
   hpa:
@@ -220,7 +220,7 @@ tracesCollector:
 metricsCollector:
   name: metrics
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   enabled: true
   mode: statefulset
   replicas: 3
@@ -233,7 +233,7 @@ metricsCollector:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.103.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.104.0
     prometheusCR:
       enabled: true
     # Override Default targetAllocator resources
@@ -348,7 +348,7 @@ metricsCollector:
 logsCollector:
   name: logs
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.103.0
+  image: otel/opentelemetry-collector-contrib:0.105.0
   enabled: false
   mode: daemonset
   resources:
@@ -1252,7 +1252,7 @@ opAMPBridge:
   addManagedLabel: false
   image:
     repository: ghcr.io/open-telemetry/opentelemetry-operator/operator-opamp-bridge
-    tag: "0.103.0"
+    tag: "0.104.0"
   endpoint: "wss://opamp.lightstep.com/v1/opamp"
   headers:
     "Authorization": "bearer ${LS_OPAMP_API_KEY}"
