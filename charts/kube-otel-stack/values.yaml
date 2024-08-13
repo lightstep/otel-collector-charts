@@ -54,26 +54,36 @@ autoinstrumentation:
 collectors: []
 
 ## Default collector for tracing
+##
+## ServiceNow recommends the OTel-Arrow exporter for sending data to
+## Cloud Observability.
 tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-
-  image: otel/opentelemetry-collector-contrib:0.105.0
+  image: "ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest"
   mode: deployment
-  replicas: 1
   hpa:
-    enabled: false
-    minReplicas: 3
-    maxReplicas: 10
-    targetMemoryUtilization: 70
+    minReplicas: 1
+    maxReplicas: 3
+    targetMemoryUtilization: 60
   resources:
-    limits:
-      cpu: 250m
-      memory: 250Mi
+    # OTel-Arrow gateways with this resource configuration have been
+    # exercised at approximately 25,000 spans per second per cpu core
+    # in our internal production setup, for reference.  Thus, a 2 cpu
+    # instance may be expected to process 50,000 spans/sec.
+    #
+    # When scaling these values, raise or lower the following settings
+    # proportionally:
+    #
+    # - concurrentbatch::max_in_flight_size_mib
+    # - exporters::otelarrow::arrow::num_streams
     requests:
-      cpu: 250m
-      memory: 250Mi
+      cpu: 2
+      memory: 4Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -89,51 +99,59 @@ tracesCollector:
           http:
             endpoint: "0.0.0.0:4318"
     processors:
-      # We recommend use of the batch processor.  We recommend the settings
-      # below for traces.
-      #
-      # Note: We are aware of ongoing efforts within OpenTelemetry to
-      # configure batching in the exporter, where it is possible to
-      # configure batch size limits in terms of bytes, instead of items.
-      # We will update these recommendations when batching by size is
-      # available.
-      batch:
-        # In this example, the processor will wait to accumulate at least
-        # 1000 spans for up to 1 second, then flush the batch.  In cases
-        # where the arriving data is already batched, such that combining
-        # the pending batch with the arriving data would exceed 1500
-        # items, then 1500 items will be sent by splitting the data.
-        #
-        # Note: the batch processor has a side-effect of returning success
-        # to the producer, before waiting for the consumer to respond.
-        # This is appropriate default in most cases, it means that SDKs
-        # sending to the gateway will not see or report errors.
-        #
-        # The batch processor responds to "back-pressure" from the
-        # exporter, meaning it is never directly responsible for dropping
-        # spans.  Note that our current recommendation for exporter
-        # settings does not respond with back-pressure to the batch
-        # processor.  Due to exporter settings, this collector
-        # configuration will drop data when the ServiceNow service is
-        # (intentionally or accidentally) refusing data, instead of
-        # applying pressure backward, discussed in the `exporters`
-        # section.
-        send_batch_size: 1000
-        send_batch_max_size: 1500
-        timeout: 1s
       resourcedetection/env:
         detectors: [env]
         timeout: 2s
         override: false
+      concurrentbatch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+
+        # Use max_in_flight_size_mib=64 in a 2 cpu configuration;
+        # Use max_in_flight_size_mib=1024 in a 16 cpu configuration.
+        max_in_flight_size_mib: 64
       k8sattributes:
         passthrough: false
         pod_association:
           - sources:
               - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: resource_attribute
                 name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+              - from: resource_attribute
+                name: k8s.node.name
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+          - sources:
+              - from: connection
         extract:
+          labels:
+            - tag_name: service.name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: service.name
+              key: k8s-app
+              from: pod
+            - tag_name: k8s.app.instance
+              key: app.kubernetes.io/instance
+              from: pod
+            - tag_name: service.version
+              key: app.kubernetes.io/version
+              from: pod
+            - tag_name: k8s.app.component
+              key: app.kubernetes.io/component
+              from: pod
           metadata:
-            - k8s.cluster.uid
             - k8s.namespace.name
             - k8s.pod.name
             - k8s.pod.uid
@@ -146,75 +164,68 @@ tracesCollector:
             - k8s.daemonset.uid
             - k8s.job.name
             - k8s.job.uid
+            - k8s.container.name
             - k8s.cronjob.name
             - k8s.statefulset.name
             - k8s.statefulset.uid
             - container.image.tag
             - container.image.name
-      resource:
-        attributes:
-          - key: lightstep.helm_chart
-            value: kube-otel-stack
-            action: insert
+            - k8s.cluster.uid
 
     exporters:
-      otlp:
+      otelarrow:
         endpoint: ingest.lightstep.com:443
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
 
-        # Queue settings are required.  It does not make sense to use
-        # the exporter without a queue, it has to do with
-        # requiring the "num_consumers" limit configured in this
-        # section (i.e., we require a queue in order to limit the
-        # number of concurrent exports).
-        #
-        # Note that the queue settings are applied in unit-terms
-        # produced by the batch processor, so a number like 100 means
-        # the queue has support for 100 pre-batched items.  With up to
-        # 1500 spans each (from the batch processor), this
-        # configuration allows 150,000 spans to occupy memory.
-        sending_queue:
-          enabled: true
-          num_consumers: 4
-          queue_size: 100
-
-        # Retry settings are optional.
-        #
-        # Note that while retries are attempted, this component will
-        # begin to drop arriving data if the queue is not large
-        # enough.
-        retry_on_failure:
-          # We recommend disabling retries, since while the export is
-          # blocked it is likely that arriving spans will drop, and
-          # Otherwise, collectors will need substantial additional
-          # memory to survive transient failures.  Nevertheless, we
-          # recommend a limited retry policy to gracefully occasional
-          # failures, paired with a modest queue size.
-          #
-          # Note there is a persistent storage option inherited from a
-          # common collector component.  When persistent storage is
-          # configured, the default retry configuration is sensible.
-          #
-          # For more details on retry and queue settings, please refer to
-          # https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md
-          enabled: true
-          max_elapsed_time: 60s
-
-        # While we expect latency under one second, typically, we
-        # recommend a longer timeout than the default.
+        # The pipeline will continue trying requests until they timeout.
+        # Timeout and retry settings are independent.  If retry_on_failure
+        # is also enabled, each (retried) request will also have this
+        # timeout.
         timeout: 30s
+
+        # Retries are disabled by default.  Since the most likely reason
+        # for failure is timeout, having retry-on-failure enabled implies
+        # dedicating a significant amount of additional memory to the task.
+        retry_on_failure:
+          enabled: false
+
+        # Do not enable the sending queue.  The concurrent batch processor
+        # is a better way to parallelize exports.
+        sending_queue:
+          enabled: false
+
+        # OTel-Arrow notes: these settings are specific to OTel-Arrow
+        # To discard this configuration and restore the standard OTLP
+        # exporter, simply drop the arrow section below and replace
+        # "otelarrow" by "otlp" as the component name above and in
+        # service::pipelines::traces::exporters.
+        arrow:
+          # This prevents the OTel-Arrow exporter from falling back to
+          # standard OTLP in case of misconfiguration.
+          disable_downgrade: true
+
+          # We recommend a small number of streams, since they consume
+          # substantial resources.  More than one stream is recommended
+          # to help balance load.
+          #
+          # Use num_streams=2 in a 2 cpu configuration;
+          # Use num_streams=12 in a 16 cpu configuration.
+          num_streams: 2
+
+          # A stream lifetime limit is required to avoid spurious
+          # disconnect error messages in the collector logs.
+          max_stream_lifetime: 4m
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
           processors:
-            - resource
             - resourcedetection/env
             - k8sattributes
-            - batch
-          exporters: [otlp]
+            - concurrentbatch
+          exporters: [otelarrow]
 
 ## Default collector for metrics (includes infrastructure metrics)
 metricsCollector:
