@@ -122,11 +122,17 @@ processors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/remotetapprocessor v0.103.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.103.0
 
-  # ServiceNow does not at this time recommend the probabilistic sampler processor,
-  # because it leads to undercounting of spans.  We will update this recommendation
-  # when the sampler is fully supported.
+  # ServiceNow recommends the probabilistic sampler processor in order to support
+  # probability sampling in the collector pipieline.  This sampler component supports
+  # OpenTelemetry sampling specifications that enable correctly adjusting counts, in
+  # metrics derived from sampled spans.
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.103.0
 
+  # The tail sampling processor is included, by request.  Please note that this component
+  # does not provide the necessary information to correctly adjust counts in metrics derived
+  # from sampled spans.
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.103.0
+    
   # You may be interested in other transform components in the
   # Collector-Contrib repository.  Here are some that might be useful:
   #
