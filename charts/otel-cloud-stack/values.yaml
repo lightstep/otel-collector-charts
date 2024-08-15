@@ -247,6 +247,16 @@ daemonCollector:
         send_batch_size: 1000
         send_batch_max_size: 1500
         timeout: 1s
+      # To apply probability sampling in the traces pipeline uncomment
+      # probabilistic_sampler in the list of processors below.
+      probabilistic_sampler:
+        # The desired sampling percentage:
+        sampling_percentage: 25
+        # "Equalizing" mode is recommended.  This mode permits SDKs to apply
+        # sampling earlier in the pipeline, leading to correspondingly less
+        # sampling in the collector.  See
+        # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/probabilisticsamplerprocessor/README.md#equalizing
+        mode: equalizing
     exporters:
       logging:
         verbosity: detailed
@@ -292,6 +302,10 @@ daemonCollector:
           exporters:
             - otlp
           processors:
+            # To configure probability sampling in the collector pipeline,
+            # enable the probabilistic sampler.
+            # - probabilisticsampler
+
             - resourcedetection/env
             - k8sattributes
             - batch
