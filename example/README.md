@@ -26,11 +26,11 @@ GO111MODULE=on go install go.opentelemetry.io/collector/cmd/builder@latest
 2. Uncomment lines in example/config.yaml that refer to required components, such as:
 
 ```yaml
-# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.103.0
-# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.103.0
-# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.103.0
-# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.103.0
-# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.103.0
+# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.107.0
+# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.107.0
+# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.107.0
+# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.107.0
+# - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.107.0
 ```
 
 ### Usage
@@ -38,17 +38,17 @@ GO111MODULE=on go install go.opentelemetry.io/collector/cmd/builder@latest
 - Generate the custom collector binary:
 
 ```bash
-builder --config ./otelcolarrow-build.yaml
+builder --config ../arrow/otelcolarrow-build.yaml
 ```
 
 - Run the custom collector:
 
 ```bash
-./dist/otelarrowcol --config ../example/vm/config.yaml
+./dist/otelarrowcol --config ./vm/config.yaml
 ```
 
 #### Troubleshooting
 
 - Note this example config does not use the concurrent batch processor. Uncomment this line instead:
 
-` - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.103.0`
+` - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.107.0`

@@ -422,23 +422,36 @@ clusterCollector:
           exporters: [otlp, logging]
 
 ## Default collector for tracing
+##
+## ServiceNow recommends the OTel-Arrow exporter for sending data to
+## Cloud Observability.
 tracesCollector:
   enabled: false
   name: traces
   clusterName: ""
-  image: otel/opentelemetry-collector-contrib:0.105.0
+  image: "ghcr.io/lightstep/otel-collector-charts/otelarrowcol-experimental:latest"
   mode: deployment
   hpa:
     minReplicas: 1
     maxReplicas: 3
-    targetMemoryUtilization: 70
+    targetMemoryUtilization: 60
   resources:
-    limits:
-      cpu: 250m
-      memory: 250Mi
+    # OTel-Arrow gateways with this resource configuration have been
+    # exercised at approximately 25,000 spans per second per cpu core
+    # in our internal production setup, for reference.  Thus, a 2 cpu
+    # instance may be expected to process 50,000 spans/sec.
+    #
+    # When scaling these values, raise or lower the following settings
+    # proportionally:
+    #
+    # - concurrentbatch::max_in_flight_size_mib
+    # - exporters::otelarrow::arrow::num_streams
     requests:
-      cpu: 250m
-      memory: 250Mi
+      cpu: 2
+      memory: 4Gi
+    limits:
+      cpu: 2
+      memory: 8Gi
   env:
     - name: LS_TOKEN
       valueFrom:
@@ -458,10 +471,14 @@ tracesCollector:
         detectors: [env]
         timeout: 2s
         override: false
-      batch:
+      concurrentbatch:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
+
+        # Use max_in_flight_size_mib=64 in a 2 cpu configuration;
+        # Use max_in_flight_size_mib=1024 in a 16 cpu configuration.
+        max_in_flight_size_mib: 64
       k8sattributes:
         passthrough: false
         pod_association:
@@ -524,10 +541,50 @@ tracesCollector:
             - k8s.cluster.uid
 
     exporters:
-      otlp:
+      otelarrow:
         endpoint: ingest.lightstep.com:443
         headers:
           "lightstep-access-token": "${LS_TOKEN}"
+
+        # The pipeline will continue trying requests until they timeout.
+        # Timeout and retry settings are independent.  If retry_on_failure
+        # is also enabled, each (retried) request will also have this
+        # timeout.
+        timeout: 30s
+
+        # Retries are disabled by default.  Since the most likely reason
+        # for failure is timeout, having retry-on-failure enabled implies
+        # dedicating a significant amount of additional memory to the task.
+        retry_on_failure:
+          enabled: false
+
+        # Do not enable the sending queue.  The concurrent batch processor
+        # is a better way to parallelize exports.
+        sending_queue:
+          enabled: false
+
+        # OTel-Arrow notes: these settings are specific to OTel-Arrow
+        # To discard this configuration and restore the standard OTLP
+        # exporter, simply drop the arrow section below and replace
+        # "otelarrow" by "otlp" as the component name above and in
+        # service::pipelines::traces::exporters.
+        arrow:
+          # This prevents the OTel-Arrow exporter from falling back to
+          # standard OTLP in case of misconfiguration.
+          disable_downgrade: true
+
+          # We recommend a small number of streams, since they consume
+          # substantial resources.  More than one stream is recommended
+          # to help balance load.
+          #
+          # Use num_streams=2 in a 2 cpu configuration;
+          # Use num_streams=12 in a 16 cpu configuration.
+          num_streams: 2
+
+          # A stream lifetime limit is required to avoid spurious
+          # disconnect error messages in the collector logs.
+          max_stream_lifetime: 4m
+
     service:
       pipelines:
         traces:
@@ -535,8 +592,8 @@ tracesCollector:
           processors:
             - resourcedetection/env
             - k8sattributes
-            - batch
-          exporters: [otlp]
+            - concurrentbatch
+          exporters: [otelarrow]
 
 logsCollector:
   enabled: false
