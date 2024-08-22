@@ -1,4 +1,4 @@
-# Last Collector-Contrib Validation: v0.103.0
+# Last Collector-Contrib Validation: v0.107.0
 receivers:
     # Receivers bring data into the OpenTelemetry Collector.
     # Generally, a receiver accepts data in a specified format,
