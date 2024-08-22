@@ -3,9 +3,16 @@ name: Create and publish a Docker image for Otel Collectors with Arrow
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "arrow/**"
   push:
     branches:
       - main
+    paths:
+      - "arrow/**"
 
 # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:

@@ -11,7 +11,7 @@
 #
 # Note: This is a relatively advanced operation, as it requires installing a Golang
 # toolchain to execute and build the collector this way. When you have this file
-# configured to your liking,
+# configured to your liking:
 #
 #   go install go.opentelemetry.io/collector/cmd/builder@latest
 #   builder --config otelarrowcol-build.yaml
