@@ -89,9 +89,8 @@ samplers, with only a brief, planned period of broken traces.
 
 Redeploy the pool of Collectors with the Probabilistic Sampler
 processor configured instead of the Satellite sampler processor.  Make
-this transition as quickly, if possible, because traces will be
-potentially incomplete as long as both samplers are configured for the
-same destination.
+this transition quickly, if possible, because traces will be
+potentially incomplete as long as both samplers being used.
 
 ```
 processors:
