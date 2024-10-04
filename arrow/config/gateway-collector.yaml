@@ -61,10 +61,6 @@ processors:
     send_batch_max_size: 1500
     send_batch_size: 1000
     timeout: 1s
-
-    # Use max_in_flight_size_mib=64 in a 2 cpu configuration;
-    # Use max_in_flight_size_mib=1024 in a 16 cpu configuration.
-    max_in_flight_size_mib: 64
     
 exporters:
   otelarrow:
@@ -109,7 +105,7 @@ exporters:
 
       # A stream lifetime limit is required to avoid spurious
       # disconnect error messages in the collector logs.
-      max_stream_lifetime: 4m
+      max_stream_lifetime: 30s
 
 service:
   pipelines:

@@ -37,13 +37,13 @@ dist:
   #   description: My Organization telemetry collector
   #
   name: otelarrowcol
-  version: 0.26.0
+  version: 0.27.0
   description: ServiceNow Cloud Observability OpenTelemetry Protocol with Apache Arrow gateway collector
 
   # This indicates which version of the core collector components as
   # well as the builder version.  At the time of this writing, we
   # recommend using at least the current release.
-  otelcol_version: 0.107.0
+  otelcol_version: 0.111.0
 
 # We recommend building in both the OTLP exporter and the OTel-Arrow
 # exporter.
@@ -51,18 +51,18 @@ exporters:
   # This is the core OpenTelemetry Protocol with Apache Arrow exporter,
   # recommended for exporting to ServiceNow Cloud Observability using
   # either OTel-Arrow or standard OTLP over gRPC.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/otelarrowexporter v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/otelarrowexporter v0.111.0
 
   # The following components may be useful for debugging.
 
   # As an alternate to the OTel-Arrow exporter, we recommend building
   # with the core OTLP exporter as a fallback.  This component and the
   # OTel-Arrow exporter use compatible configuration.
-  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.107.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.111.0
 
   # In case OTLP/HTTP export is required, as opposed to the two
   # gRPC options above.
-  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.107.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.111.0
 
   # In case you want to record an OTLP telemetry session to a JSON
   # file, we recommend this additional utility.  See also the
@@ -72,7 +72,7 @@ exporters:
   - gomod: github.com/open-telemetry/otel-arrow/collector/exporter/fileexporter v0.25.0
 
   # The debug exporter, useful for printing telemetry to the console.
-  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.107.0
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.111.0
 
 receivers:
   # The OTel-Arrow receiver supports multiple protocols including OTel-Arrow, OTLP gRPC,
@@ -82,18 +82,18 @@ receivers:
   # This enables other OTel Collectors or experimental SDKs that support OTel-Arrow to
   # send to this collector, such as this one for the OTel-Go Trace SDK:
   # https://github.com/lightstep/otel-launcher-go/tree/main/lightstep/sdk/trace/exporters/otlp/otelcol
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/otelarrowreceiver v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/otelarrowreceiver v0.111.0
 
   # To support receiving OTLP/HTTP.
-  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.107.0
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.111.0
 
   # You may wish to enable other receivers from the Collector-Contrib repository or
   # elsewhere.  Here are some that might be useful:
   #
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.107.0
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.107.0
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.107.0
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.107.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver v0.111.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.111.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver v0.111.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8sclusterreceiver v0.111.0
 
 processors:
   # We recommend use of the OTel-Arrow concurrent batch processor.
@@ -107,38 +107,38 @@ processors:
   # processor or the core batch processor, i.e., do not build with
   # either of:
   # - go.opentelemetry.io/collector/processor/memorylimiterprocessor.
-  # - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.107.0
+  # - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.111.0
 
   # These Collector-Contrib components are referred to in the charts in this package.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/remotetapprocessor v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/remotetapprocessor v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.111.0
 
   # ServiceNow recommends the probabilistic sampler processor in order to support
   # probability sampling in the collector pipieline.  This sampler component supports
   # OpenTelemetry sampling specifications that enable correctly adjusting counts, in
   # metrics derived from sampled spans.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.111.0
 
   # The tail sampling processor is included, by request.  Please note that this component
   # does not provide the necessary information to correctly adjust counts in metrics derived
   # from sampled spans.
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/tailsamplingprocessor v0.111.0
 
   # You may be interested in other transform components in the
   # Collector-Contrib repository.  Here are some that might be useful:
   #
-  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.107.0
+  # - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.111.0
 
 extensions:
   # You may be interested in externsions from the Collector-Contrib repository.  None are
   # required.  Here are some that might be useful:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.107.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/opampextension v0.107.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.111.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/opampextension v0.111.0
 
   # We do not support use of headersetterextension to apply the lightstep-access-token
   # header on a per-request basis.  Contact ServiceNow if you are interested in
