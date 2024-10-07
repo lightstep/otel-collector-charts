@@ -1,4 +1,4 @@
-FROM golang:1.21 AS sandbox
+FROM golang:1.22 AS sandbox
 
 WORKDIR /otelarrowcol
 COPY . .
