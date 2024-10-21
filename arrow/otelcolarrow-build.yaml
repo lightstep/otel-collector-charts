@@ -145,6 +145,13 @@ extensions:
   # multi-tenancy with OTel-Arrow.  Do not build with
   # github.com/open-telemetry/opentelemetry-collector-contrib/extension/headerssetterextension
 
+providers:
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.17.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.17.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpprovider v1.17.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/httpsprovider v1.17.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.17.0
+
 # If you are building this collector in an Golang monorepo, or to apply security patches
 # and other overrides to the go.mod file, use this section.
 replaces:
