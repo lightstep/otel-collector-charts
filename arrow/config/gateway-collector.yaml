@@ -23,7 +23,7 @@
 #       cpu: 32
 #       memory: 64Gi
 #
-# In the larger configuration tested, we used `max_in_flight_size_mib: 256`.
+# In the larger configuration tested, we set `admission::request_size_mib: 256`.
 # In the smaller configuration, relatively more memory is required due to
 # garbage collection costs.
 
@@ -46,6 +46,12 @@ receivers:
           server_parameters:
             max_connection_age: 30s
             max_connection_age_grace: 2m30s
+
+      # This receiver applies admission control to OTLP and OTel-Arrow data
+      # based on a count of uncompressed bytes.  For larger instance sizes,
+      # raise this parameter.
+      admission:
+        request_size_mib: 128
 
   # otlp is the core OTLP exporter, which we enable to receive
   # OTLP/HTTP data.

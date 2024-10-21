@@ -76,7 +76,7 @@ tracesCollector:
     # When scaling these values, raise or lower the following settings
     # proportionally:
     #
-    # - concurrentbatch::max_in_flight_size_mib
+    # - receiver::admission::request_size_mib
     # - exporters::otelarrow::arrow::num_streams
     requests:
       cpu: 2
@@ -107,10 +107,6 @@ tracesCollector:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
-
-        # Use max_in_flight_size_mib=64 in a 2 cpu configuration;
-        # Use max_in_flight_size_mib=1024 in a 16 cpu configuration.
-        max_in_flight_size_mib: 64
       k8sattributes:
         passthrough: false
         pod_association:
