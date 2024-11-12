@@ -3,7 +3,7 @@ name: otelcollector
 description: Deprecated chart for using the OpenTelemetry Collector to scape static or dynamic metric targets.
 type: application
 version: 0.5.0
-appVersion: 0.111.0
+appVersion: 0.113.0
 deprecated: true
 dependencies: []
 # cert manager must be manually installed because it has CRDs
