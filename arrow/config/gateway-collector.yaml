@@ -23,7 +23,7 @@
 #       cpu: 32
 #       memory: 64Gi
 #
-# In the larger configuration tested, we used `max_in_flight_size_mib: 256`.
+# In the larger configuration tested, we set `admission::request_size_mib: 256`.
 # In the smaller configuration, relatively more memory is required due to
 # garbage collection costs.
 
@@ -47,6 +47,12 @@ receivers:
             max_connection_age: 30s
             max_connection_age_grace: 2m30s
 
+      # This receiver applies admission control to OTLP and OTel-Arrow data
+      # based on a count of uncompressed bytes.  For larger instance sizes,
+      # raise this parameter.
+      admission:
+        request_size_mib: 128
+
   # otlp is the core OTLP exporter, which we enable to receive
   # OTLP/HTTP data.
   otlp:
@@ -61,10 +67,6 @@ processors:
     send_batch_max_size: 1500
     send_batch_size: 1000
     timeout: 1s
-
-    # Use max_in_flight_size_mib=64 in a 2 cpu configuration;
-    # Use max_in_flight_size_mib=1024 in a 16 cpu configuration.
-    max_in_flight_size_mib: 64
     
 exporters:
   otelarrow:
@@ -109,7 +111,7 @@ exporters:
 
       # A stream lifetime limit is required to avoid spurious
       # disconnect error messages in the collector logs.
-      max_stream_lifetime: 4m
+      max_stream_lifetime: 30s
 
 service:
   pipelines:
