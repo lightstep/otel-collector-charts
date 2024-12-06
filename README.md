@@ -1,13 +1,14 @@
 # ServiceNow Cloud Observability (formerly Lightstep) OpenTelemetry Collector Helm Charts
 
-This is the repository for recommended [Helm](https://helm.sh/) charts for running an OpenTelemetry Collector using the [OpenTelemetry Operator for Kubernetes](https://github.com/open-telemetry/opentelemetry-operator). We recommend following the quick start documenation [here](https://docs.lightstep.com/docs/quick-start-infra-otel-first) for using these charts.
+**⚠️ Warning:** These OpenTelemetry Helm charts are deprecated. We recommend the official OpenTelemetry community helm charts available at [https://github.com/open-telemetry/opentelemetry-helm-charts](https://github.com/open-telemetry/opentelemetry-helm-charts). 
 
-⚠️ These OpenTelemetry Helm charts are under active development and may have breaking changes between releases.
+This is the repository for [Helm](https://helm.sh/) charts for running an OpenTelemetry Collector using the [OpenTelemetry Operator for Kubernetes](https://github.com/open-telemetry/opentelemetry-operator). We recommend following the quick start documenation [here](https://docs.lightstep.com/docs/quick-start-infra-otel-first) for using these charts.
+
 
 ## Charts
 
-- [otel-cloud-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/otel-cloud-stack) - **Recommended** chart for sending Kubernetes metrics to ServiceNow Cloud Observability using OpenTelemetry-native metric collection and the OpenTelemetry Operator.
-- [kube-otel-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/kube-otel-stack) - Drop in replacement for [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack), which uses the same configuration for scraping Prometheus exporters and forwarding metrics to Lightstep using the OpenTelemetry Operator. Use this chart if you are looking to compare Kubernetes monitoring in Prometheus with Kubernetes monitoring using ServiceNow Cloud Observability.
+- [otel-cloud-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/otel-cloud-stack) - **Deprecated** chart for sending Kubernetes metrics to ServiceNow Cloud Observability using OpenTelemetry-native metric collection and the OpenTelemetry Operator.
+- [kube-otel-stack](https://github.com/lightstep/prometheus-k8s-opentelemetry-collector/tree/main/charts/kube-otel-stack) - **Deprecated** replacement for [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack), which uses the same configuration for scraping Prometheus exporters and forwarding metrics to Lightstep using the OpenTelemetry Operator. Use this chart if you are looking to compare Kubernetes monitoring in Prometheus with Kubernetes monitoring using ServiceNow Cloud Observability.
 
 ## Arrow Usage
 
