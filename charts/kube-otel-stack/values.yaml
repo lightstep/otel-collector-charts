@@ -1252,7 +1252,8 @@ prometheus-node-exporter:
     pspEnabled: false
 
 opAMPBridge:
-  enabled: true
+  # not supported in lightstep.com
+  enabled: false
   # Adds `opentelemetry.io/opamp-reporting: true` to all collectors
   addReportingLabel: true
   # Adds `opentelemetry.io/opamp-managed: true` to all collectors

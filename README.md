@@ -1,9 +1,8 @@
 # ServiceNow Cloud Observability (formerly Lightstep) OpenTelemetry Collector Helm Charts
 
-**⚠️ Warning:** These OpenTelemetry Helm charts are deprecated. We recommend the official OpenTelemetry community helm charts available at [https://github.com/open-telemetry/opentelemetry-helm-charts](https://github.com/open-telemetry/opentelemetry-helm-charts). 
+**⚠️ Warning:** These OpenTelemetry Helm charts are deprecated. We recommend the official OpenTelemetry community helm charts available at [https://github.com/open-telemetry/opentelemetry-helm-charts](https://github.com/open-telemetry/opentelemetry-helm-charts).
 
 This is the repository for [Helm](https://helm.sh/) charts for running an OpenTelemetry Collector using the [OpenTelemetry Operator for Kubernetes](https://github.com/open-telemetry/opentelemetry-operator). We recommend following the quick start documenation [here](https://docs.lightstep.com/docs/quick-start-infra-otel-first) for using these charts.
-
 
 ## Charts
 
