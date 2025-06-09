@@ -220,17 +220,6 @@ extensions:
     # supports running liveness checks for the Collector.
     # For more details, see
     # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/extension/healthcheckextension/README.md
-    opamp:
-        # If this collector :is not running in Kubernetes, we recommend adding
-        # this opampextension to report on the Collector config and status.
-        # For more details or if running the collector in Kubernetes,
-        # see https://docs.lightstep.com/docs/monitor-collector-health
-        server:
-            ws:
-                endpoint: "wss://opamp.lightstep.com/v1/opamp"
-                # endpoint: "wss://opamp.eu.lightstep.com/v1/opamp" # EU data center
-                headers:
-                    "Authorization": "bearer ${LS_OPAMP_API_KEY}"
 
 service:
     # The service section configures the enabled components in the Collector
@@ -238,7 +227,7 @@ service:
     # This config defines the trace, metric, and log pipelines, the Cloud Observability
     # default extensions, and Collector telemetry.
     # If a component is configured but not defined in the service section, then it's not enabled.
-    extensions: [health_check, opamp]
+    extensions: [health_check]
     telemetry:
         metrics:
             address: :8888
